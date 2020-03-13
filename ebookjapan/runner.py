@@ -1,21 +1,19 @@
 # --- coding: utf-8 ---
 """
-ebookjapanの実行クラスモジュール
+ebookjapan の実行クラスモジュール
 """
 
-import re
 import sys
 from os import path
 from datetime import datetime
 from runner import AbstractRunner
 from ebookjapan.login import YahooLogin
 from ebookjapan.manager import Manager
-from ebookjapan.config import BoundOnSide
 
 
 class Runner(AbstractRunner):
     """
-    ebookjapanの実行クラス
+    ebookjapan の実行クラス
     """
 
     OPTION_BOUND_ON_LEFT_SIDE = 'L'
@@ -35,7 +33,7 @@ class Runner(AbstractRunner):
 
     patterns = ['books\\/\\d+']
     """
-    サポートするebookjapanのパスの正規表現のパターンのリスト
+    サポートする ebookjapan のパスの正規表現のパターンのリスト
     """
 
     is_login = False
@@ -45,7 +43,7 @@ class Runner(AbstractRunner):
 
     def run(self):
         """
-        ebookjapanの実行
+        ebookjapan の実行
         """
         try:
             if (self.config.ebookjapan.needs_login and
@@ -58,7 +56,7 @@ class Runner(AbstractRunner):
             print('ログイン時にエラーが発生しました: %s' %
                   err.with_traceback(sys.exc_info()[2]))
             return
-        print('Loading page of inputed url (%s)' % self.url)
+        print('Loading page of inputted url (%s)' % self.url)
         self.browser.visit(self.url)
 
         if self._move_main_page():
@@ -69,7 +67,9 @@ class Runner(AbstractRunner):
             print('ページの取得に失敗しました')
             return
 
-        _destination = input('Output Path > ')
+        _destination = self.url[self.url.rindex('books/') + 6:-1].replace('/', '_')
+        print(f'Output Path : {_destination}')
+#        _destination = input('Output Path > ')
         _manager = Manager(
             self.browser, self.config.ebookjapan, _destination)
         _result = _manager.start()
@@ -112,7 +112,7 @@ class Runner(AbstractRunner):
         実際の本のページに移動する
         """
         _elements = self.browser.find_by_css('.btn.btn--primary.btn--read')
-        if len(_elements) != 0 and _elements.first.text == '読む':
+        if len(_elements) != 0 and '読む' in _elements.first.text:
             _elements.first.click()
             return True
         return False

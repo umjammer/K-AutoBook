@@ -3,7 +3,6 @@
 ebookjapanの操作を行うためのクラスモジュール
 """
 
-from datetime import datetime
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
 from PIL import Image
@@ -113,6 +112,9 @@ class Manager(object):
         ページの自動スクリーンショットを開始する
         @return エラーが合った場合にエラーメッセージを、成功時に True を返す
         """
+        self.browser.driver.set_window_size(self.config.window_size['width'], self.config.window_size['height'])
+        print(f'{self.config.window_size["width"]}x{self.config.window_size["height"]}')
+
         time.sleep(2)
         _total = self._get_total_page()
         if _total is None:

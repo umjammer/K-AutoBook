@@ -4,6 +4,8 @@
 """
 
 from ebookjapan.config import Config as EbookjapanConfig
+from bookwalker.config import Config as BookwalkerConfig
+from ganganonline.config import Config as GanganonlineConfig
 
 
 class Config(object):
@@ -17,6 +19,7 @@ class Config(object):
         @param data 設定情報
         """
         self.driver = 'phantomjs'
+        self.chrome_path = '/usr/local/bin/chromedriver'
         """
         開くブラウザのドライバ
         """
@@ -27,11 +30,9 @@ class Config(object):
         """
         User Agent
         """
-        self.window_size = {'width': 2880, 'height': 1800}
+        self.headless = False
         """
-        ウィンドウサイズ
-        width: 横幅
-        height: 高さ
+        headless or not
         """
         self.log_directory = '/tmp/k_auto_book/'
         """
@@ -40,6 +41,14 @@ class Config(object):
         self.ebookjapan = EbookjapanConfig()
         """
         ebookjapan の設定情報
+        """
+        self.bookwalker = BookwalkerConfig()
+        """
+        bookwalker の設定情報
+        """
+        self.ganganonline = GanganonlineConfig()
+        """
+        ganganonline の設定情報
         """
         if isinstance(data, dict):
             self.update(data)
@@ -54,13 +63,16 @@ class Config(object):
             self.driver = data['driver']
         if 'user_agent' in data:
             self.user_agent = data['user_agent']
-        if 'window_size' in data:
-            if 'width' in data['window_size']:
-                self.window_size['width'] = int(data['window_size']['width'])
-            if 'height' in data['window_size']:
-                self.window_size['height'] = int(data['window_size']['height'])
+        if 'chrome_path' in data:
+            self.chrome_path = data['chrome_path']
+        if 'headless' in data:
+            self.headless = bool(data['headless'])
         if 'log_directory' in data:
             self.log_directory = data['log_directory']
         if 'ebookjapan' in data:
             self.ebookjapan.update(data['ebookjapan'])
+        if 'bookwalker' in data:
+            self.bookwalker.update(data['bookwalker'])
+        if 'ganganonline' in data:
+            self.ganganonline.update(data['ganganonline'])
         return

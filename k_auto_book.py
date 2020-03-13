@@ -6,9 +6,12 @@ import os
 import re
 from os import path
 from splinter import Browser
+from selenium.webdriver import ChromeOptions
 from config import Config
 from ebookjapan.runner import Runner as Ebookjapan
 from alphapolis.runner import Runner as Alphapolis
+from bookwalker.runner import Runner as Bookwalker
+from ganganonline.runner import Runner as Ganganonline
 
 
 def _load_config_data():
@@ -30,14 +33,17 @@ def _make_directory(directory):
 
 def _initialize_browser(config):
     log_name = path.join(config.log_directory, 'ghostdriver.log')
-    _browser = Browser(
-        config.driver, headless=True, user_agent=config.user_agent, service_log_path=log_name)
-    _width = config.window_size['width']
-    _height = config.window_size['height']
     if config.driver == 'chrome':
-        _width = _width / 2
-        _height = _height / 2
-    _browser.driver.set_window_size(_width, _height)
+        chrome_options = ChromeOptions()
+        chrome_options.add_argument('high-dpi-support=1')
+        chrome_options.add_argument('device-scale-factor=1')
+        chrome_options.add_argument('force-device-scale-factor=1')
+        _browser = Browser(
+            config.driver, headless=config.headless, user_agent=config.user_agent, service_log_path=log_name,
+            options=chrome_options)
+    else:
+        _browser = Browser(
+            config.driver, headless=config.headless, user_agent=config.user_agent, service_log_path=log_name)
     return _browser
 
 
@@ -66,6 +72,10 @@ def _main():
             _runner = Ebookjapan(_browser, _input_data, _config, _options)
         elif Alphapolis.check(_url):
             _runner = Alphapolis(_browser, _input_data, _config, _options)
+        elif Bookwalker.check(_url):
+            _runner = Bookwalker(_browser, _input_data, _config, _options)
+        elif Ganganonline.check(_url):
+            _runner = Ganganonline(_browser, _input_data, _config, _options)
         else:
             print('入力されたURLはサポートしていません')
             continue

@@ -3,3 +3,4 @@ config.json
 ghostdriver.log
 .DS_Store
 
+logs

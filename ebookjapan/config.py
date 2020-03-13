@@ -69,6 +69,12 @@ class Config(object):
         """
         本の綴じ場所
         """
+        self.window_size = {'width': 960, 'height': 1200}
+        """
+        ウィンドウサイズ
+        width: 横幅
+        height: 高さ
+        """
         if isinstance(data, dict):
             self.update(data)
         return
@@ -90,6 +96,11 @@ class Config(object):
             self.sleep_time = data['sleep_time']
         if 'bound_on_side' in data:
             self._set_bound_on_side(data['bound_on_side'])
+        if 'window_size' in data:
+            if 'width' in data['window_size']:
+                self.window_size['width'] = int(data['window_size']['width'])
+            if 'height' in data['window_size']:
+                self.window_size['height'] = int(data['window_size']['height'])
         return
 
     def _set_image_format(self, format):
