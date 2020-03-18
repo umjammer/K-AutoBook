@@ -12,6 +12,7 @@ from ebookjapan.runner import Runner as Ebookjapan
 from alphapolis.runner import Runner as Alphapolis
 from bookwalker.runner import Runner as Bookwalker
 from ganganonline.runner import Runner as Ganganonline
+from linemanga.runner import Runner as Linemanga
 
 
 def _load_config_data():
@@ -76,6 +77,8 @@ def _main():
             _runner = Bookwalker(_browser, _input_data, _config, _options)
         elif Ganganonline.check(_url):
             _runner = Ganganonline(_browser, _input_data, _config, _options)
+        elif Linemanga.check(_url):
+            _runner = Linemanga(_browser, _input_data, _config, _options)
         else:
             print('入力されたURLはサポートしていません')
             continue

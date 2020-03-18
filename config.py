@@ -6,7 +6,7 @@
 from ebookjapan.config import Config as EbookjapanConfig
 from bookwalker.config import Config as BookwalkerConfig
 from ganganonline.config import Config as GanganonlineConfig
-
+from linemanga.config import Config as LinemangaConfig
 
 class Config(object):
     """
@@ -50,6 +50,10 @@ class Config(object):
         """
         ganganonline の設定情報
         """
+        self.linemanga = LinemangaConfig()
+        """
+        linemanga の設定情報
+        """
         if isinstance(data, dict):
             self.update(data)
         return
@@ -75,4 +79,6 @@ class Config(object):
             self.bookwalker.update(data['bookwalker'])
         if 'ganganonline' in data:
             self.ganganonline.update(data['ganganonline'])
+        if 'linemanga' in data:
+            self.linemanga.update(data['linemanga'])
         return
