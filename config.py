@@ -7,6 +7,7 @@ from ebookjapan.config import Config as EbookjapanConfig
 from bookwalker.config import Config as BookwalkerConfig
 from ganganonline.config import Config as GanganonlineConfig
 from linemanga.config import Config as LinemangaConfig
+from comicwalker.config import Config as ComicwalkerConfig
 
 class Config(object):
     """
@@ -54,6 +55,10 @@ class Config(object):
         """
         linemanga の設定情報
         """
+        self.comicwalker = ComicwalkerConfig()
+        """
+        comicwalker の設定情報
+        """
         if isinstance(data, dict):
             self.update(data)
         return
@@ -81,4 +86,6 @@ class Config(object):
             self.ganganonline.update(data['ganganonline'])
         if 'linemanga' in data:
             self.linemanga.update(data['linemanga'])
+        if 'comicwalker' in data:
+            self.comicwalker.update(data['comicwalker'])
         return

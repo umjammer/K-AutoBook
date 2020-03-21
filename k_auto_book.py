@@ -13,6 +13,7 @@ from alphapolis.runner import Runner as Alphapolis
 from bookwalker.runner import Runner as Bookwalker
 from ganganonline.runner import Runner as Ganganonline
 from linemanga.runner import Runner as Linemanga
+from comicwalker.runner import Runner as Comicwalker
 
 
 def _load_config_data():
@@ -39,6 +40,8 @@ def _initialize_browser(config):
         chrome_options.add_argument('high-dpi-support=1')
         chrome_options.add_argument('device-scale-factor=1')
         chrome_options.add_argument('force-device-scale-factor=1')
+        chrome_options.add_argument('disable-gpu=1')
+
         _browser = Browser(
             config.driver, headless=config.headless, user_agent=config.user_agent, service_log_path=log_name,
             options=chrome_options)
@@ -79,6 +82,8 @@ def _main():
             _runner = Ganganonline(_browser, _input_data, _config, _options)
         elif Linemanga.check(_url):
             _runner = Linemanga(_browser, _input_data, _config, _options)
+        elif Comicwalker.check(_url):
+            _runner = Comicwalker(_browser, _input_data, _config, _options)
         else:
             print('入力されたURLはサポートしていません')
             continue

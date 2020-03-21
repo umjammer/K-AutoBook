@@ -36,5 +36,12 @@
         "image_format": "JPEG",
         "sleep_time": 0.5,
         "cookie": "how to get cookie: see 'https://github.com/xuzhengyi1995/Bookwalker_Downloader' (!!! caution: target site is 'https://manga.line.me/' !!!)"
+    },
+    "comicwalker": {
+        "needs_login": false,
+        "username": "",
+        "password": "",
+        "image_format": "JPEG",
+        "sleep_time": 0.5
     }
 }
