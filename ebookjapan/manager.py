@@ -7,6 +7,8 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
 from PIL import Image
 from os import path
+
+from retry import retry
 from ebookjapan.config import Config, ImageFormat, BoundOnSide
 import os
 import time
@@ -32,7 +34,7 @@ class Manager(object):
     トリミングを容易にするための背景色
     """
 
-    MAX_LOADING_TIME = 5
+    MAX_LOADING_TIME = 10
     """
     初回読み込み時の最大待ち時間
     """
@@ -136,16 +138,19 @@ class Manager(object):
         _count = 0
         while True:
             self._print_progress(_total, _current)
-            _temporary_page = Manager.IMAGE_DIRECTORY + 'K-AutoBook.png'
-            self.browser.driver.save_screenshot(_temporary_page)
-            _name = '%s%s%03d%s' % (
-                self.directory, self.prefix, _count, _extension)
-            if _current == _total:
-                self._triming(_temporary_page, _name, _format)
+
+            _image = self._trimming(_count, _current in (2, _total - 2, _total - 1))
+            _name = '%s%s%03d%s' % (self.directory, self.prefix, _count, _extension)
+            _image.save(_name, _format.upper())
+
+            if _current < _total:
+                self._next()
+                while self._get_current_page() != _current + 1:
+                    time.sleep(0.1)
+                time.sleep(_sleep_time)
+            else:
                 break
-            self._next()
-            self._triming(_temporary_page, _name, _format)
-            time.sleep(_sleep_time)
+
             _current = self._get_current_page()
             _count = _count + 1
         self._print_progress(_total, is_end=True)
@@ -184,7 +189,8 @@ class Manager(object):
         """
         return int(self.current_page_element.html[:-2])
 
-    def _check_directory(self, directory):
+    @staticmethod
+    def _check_directory(directory):
         """
         ディレクトリの存在を確認して，ない場合はそのディレクトリを作成する
         @param directory 確認するディレクトリのパス
@@ -197,7 +203,8 @@ class Manager(object):
                 raise
         return
 
-    def _print_progress(self, total, current=0, is_end=False):
+    @staticmethod
+    def _print_progress(total, current=0, is_end=False):
         """
         進捗を表示する
         @param total ページの総数
@@ -211,14 +218,17 @@ class Manager(object):
             print('\x1B[10000D', end='', flush=True)
         return
 
-    def _triming(self, source, destination, format):
+    @retry(tries=10, delay=1)
+    def _trimming(self, current, ignore_blank):
         """
         画像の両端の色と異なる色になる場所でトリミングする
-        @param source 元となる画像のパス
-        @param destination 出力する画像のパス
-        @param format 書き出す画像のフォーマット
+        @param current ページ番号
+        @param ignore_blank キャプチャミスを無視するかどうか
         """
-        _image = Image.open(source)
+        _temporary_page = Manager.IMAGE_DIRECTORY + 'K-AutoBook.png'
+        self.browser.driver.save_screenshot(_temporary_page)
+        _image = Image.open(_temporary_page)
+
         _width, _height = _image.size
         _start_x = 0
         _end_x = _width
@@ -243,8 +253,23 @@ class Manager(object):
         if self.config is not None and (
                 self.config.image_format == ImageFormat.JPEG):
             _image = _image.convert('RGB')
-        _image.save(destination, format.upper())
-        return
+
+        if self._is_blank_image(_image):
+            print(f'blank page detected: {current}')
+            if not ignore_blank:
+                raise Exception
+
+        return _image
+
+    @staticmethod
+    def _is_blank_image(image):
+        _width, _height = image.size
+        for y in range(_height):
+            for x in range(_width):
+                r, g, b = image.getpixel((x, y))
+                if r != 255 or g != 255 or b != 255:
+                    return False
+        return True
 
     def _next(self):
         """
