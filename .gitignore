@@ -4,3 +4,6 @@ ghostdriver.log
 .DS_Store
 
 logs
+
+*.png
+*.jpg

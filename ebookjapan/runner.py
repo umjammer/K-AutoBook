@@ -9,6 +9,7 @@ from datetime import datetime
 from runner import AbstractRunner
 from ebookjapan.login import YahooLogin
 from ebookjapan.manager import Manager
+from ebookjapan.config import Config as EbookjapanConfig
 
 
 class Runner(AbstractRunner):
@@ -31,7 +32,7 @@ class Runner(AbstractRunner):
     サポートするドメイン
     """
 
-    patterns = ['books\\/\\d+']
+    patterns = ['books\\/(\\d+)']
     """
     サポートする ebookjapan のパスの正規表現のパターンのリスト
     """
@@ -45,8 +46,12 @@ class Runner(AbstractRunner):
         """
         ebookjapan の実行
         """
+        self.sub_config = EbookjapanConfig()
+        if 'ebookjapan' in self.config.raw:
+            self.sub_config.update(self.config.raw['ebookjapan'])
+
         try:
-            if (self.config.ebookjapan.needs_login and
+            if (self.sub_config.needs_login and
                     not self._is_login() and not self._login()):
                 return
         except Exception as err:
@@ -71,7 +76,7 @@ class Runner(AbstractRunner):
         print(f'Output Path : {_destination}')
 #        _destination = input('Output Path > ')
         _manager = Manager(
-            self.browser, self.config.ebookjapan, _destination)
+            self.browser, self.sub_config, _destination)
         _result = _manager.start()
         if _result is not True:
             print(_result)
@@ -95,11 +100,11 @@ class Runner(AbstractRunner):
         ログイン処理を行う
         @return ログイン成功時に True を返す
         """
-        if self.config.ebookjapan.username and self.config.ebookjapan.password:
+        if self.sub_config.username and self.sub_config.password:
             yahoo = YahooLogin(
                 self.browser,
-                self.config.ebookjapan.username,
-                self.config.ebookjapan.password)
+                self.sub_config.username,
+                self.sub_config.password)
         else:
             yahoo = YahooLogin(self.browser)
         if yahoo.login():

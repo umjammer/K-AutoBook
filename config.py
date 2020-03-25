@@ -3,11 +3,6 @@
 設定クラスモジュール
 """
 
-from ebookjapan.config import Config as EbookjapanConfig
-from bookwalker.config import Config as BookwalkerConfig
-from ganganonline.config import Config as GanganonlineConfig
-from linemanga.config import Config as LinemangaConfig
-from comicwalker.config import Config as ComicwalkerConfig
 
 class Config(object):
     """
@@ -39,25 +34,9 @@ class Config(object):
         """
         ログを出力するディレクトリパス
         """
-        self.ebookjapan = EbookjapanConfig()
+        self.raw = data
         """
-        ebookjapan の設定情報
-        """
-        self.bookwalker = BookwalkerConfig()
-        """
-        bookwalker の設定情報
-        """
-        self.ganganonline = GanganonlineConfig()
-        """
-        ganganonline の設定情報
-        """
-        self.linemanga = LinemangaConfig()
-        """
-        linemanga の設定情報
-        """
-        self.comicwalker = ComicwalkerConfig()
-        """
-        comicwalker の設定情報
+        raw data
         """
         if isinstance(data, dict):
             self.update(data)
@@ -78,14 +57,4 @@ class Config(object):
             self.headless = bool(data['headless'])
         if 'log_directory' in data:
             self.log_directory = data['log_directory']
-        if 'ebookjapan' in data:
-            self.ebookjapan.update(data['ebookjapan'])
-        if 'bookwalker' in data:
-            self.bookwalker.update(data['bookwalker'])
-        if 'ganganonline' in data:
-            self.ganganonline.update(data['ganganonline'])
-        if 'linemanga' in data:
-            self.linemanga.update(data['linemanga'])
-        if 'comicwalker' in data:
-            self.comicwalker.update(data['comicwalker'])
         return

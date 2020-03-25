@@ -2,18 +2,19 @@
 """
 comicwalker の実行クラスモジュール
 """
-
+import re
 import sys
 from os import path
 from datetime import datetime
 from runner import AbstractRunner
 from comicwalker.login import YahooLogin
 from comicwalker.manager import Manager
+from comicwalker.config import Config as ComicwalkerConfig
 
 
 class Runner(AbstractRunner):
     """
-    comicwalker の実行クラス
+    comic-walker の実行クラス
     https://comic-walker.com/viewer/?tw=2&dlcl=ja&cid=KDCW_MF09000001010005_68
     """
 
@@ -22,9 +23,9 @@ class Runner(AbstractRunner):
     サポートするドメイン
     """
 
-    patterns = ['viewer\\/.*&cid=KDCW_[A-Z]{2}[0-9]{14}_[0-9]{2}']
+    patterns = ['viewer\\/.*&cid=(KDCW_[A-Z]{2}[0-9]{14}_[0-9]{2})']
     """
-    サポートする comicwalker のパスの正規表現のパターンのリスト
+    サポートする comic-walker のパスの正規表現のパターンのリスト
     """
 
     is_login = False
@@ -34,10 +35,14 @@ class Runner(AbstractRunner):
 
     def run(self):
         """
-        comicwalker の実行
+        comic-walker の実行
         """
+        self.sub_config = ComicwalkerConfig()
+        if 'comicwalker' in self.config.raw:
+            self.sub_config.update(self.config.raw['comicwalker'])
+
         try:
-            if (self.config.comicwalker.needs_login and
+            if (self.sub_config.needs_login and
                     not self._is_login() and not self._login()):
                 return
         except Exception as err:
@@ -47,14 +52,15 @@ class Runner(AbstractRunner):
             print('ログイン時にエラーが発生しました: %s' %
                   err.with_traceback(sys.exc_info()[2]))
             return
-        print('Loading page of inputed url (%s)' % self.url)
+        print('Loading page of inputted url (%s)' % self.url)
         self.browser.visit(self.url)
 
-        _destination = self.url[self.url.rindex('cid=') + 4:]
+        # _destination = input('Output Path > ')
+        _destination = self.get_id()
         print(f'Output Path : {_destination}')
-#        _destination = input('Output Path > ')
+
         _manager = Manager(
-            self.browser, self.config.comicwalker, _destination)
+            self.browser, self.sub_config, _destination)
         _result = _manager.start()
         if _result is not True:
             print(_result)
@@ -78,11 +84,11 @@ class Runner(AbstractRunner):
         ログイン処理を行う
         @return ログイン成功時に True を返す
         """
-        if self.config.comicwalker.username and self.config.comicwalker.password:
+        if self.sub_config.username and self.sub_config.password:
             yahoo = YahooLogin(
                 self.browser,
-                self.config.comicwalker.username,
-                self.config.comicwalker.password)
+                self.sub_config.username,
+                self.sub_config.password)
         else:
             yahoo = YahooLogin(self.browser)
         if yahoo.login():

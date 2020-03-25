@@ -1,9 +1,10 @@
 # --- coding: utf-8 ---
 """
-ganganonline の操作を行うためのクラスモジュール
+gangan-online の操作を行うためのクラスモジュール
 """
-import base64
 
+import base64
+from tqdm import tqdm
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
 from os import path
@@ -14,7 +15,7 @@ import time
 
 class Manager(object):
     """
-    ganganonline の操作を行うためのクラス
+    gangan-online の操作を行うためのクラス
     """
 
     MAX_LOADING_TIME = 5
@@ -24,7 +25,7 @@ class Manager(object):
 
     def __init__(self, browser, config=None, directory='./', prefix=''):
         """
-        ganganonline の操作を行うためのコンストラクタ
+        gangan-online の操作を行うためのコンストラクタ
         @param browser splinter のブラウザインスタンス
         """
         self.browser = browser
@@ -33,7 +34,7 @@ class Manager(object):
         """
         self.config = config if isinstance(config, Config) else None
         """
-        ganganonline の設定情報
+        gangan-online の設定情報
         """
         self.directory = None
         """
@@ -50,6 +51,10 @@ class Manager(object):
         self.current_page_element = None
         """
         現在表示されているページのページ番号が表示されるエレメント
+        """
+        self.pbar = None
+        """
+        progress bar
         """
 
         self._set_directory(directory)
@@ -76,7 +81,7 @@ class Manager(object):
         while path.exists(_base_path + str(i)):
             i = i + 1
         self.directory = _base_path + str(i) + '/'
-        print("Change output directory to '%s' because '%s' alreadly exists"
+        print("Change output directory to '%s' because '%s' already exists"
               % (self.directory, directory))
         return
 
@@ -122,8 +127,8 @@ class Manager(object):
         time.sleep(_sleep_time)
 
         _count = 0
+        self.pbar = tqdm(bar_format='{n_fmt}/{total_fmt}')
         while True:
-            self._print_progress(-1, _count + 1)
             _name = '%s%s%03d%s' % (
                 self.directory, self.prefix, _count, _extension)
 
@@ -136,12 +141,14 @@ class Manager(object):
                 if _count != 0:
                     with open(_name, 'wb') as f:
                         f.write(image)
+                    self.pbar.update(1)
 
                 self._next()
                 time.sleep(_sleep_time)
 
                 _count = _count + 1
-        self._print_progress(-1, is_end=True)
+
+        print('', flush=True)
         return True
 
     def _check_directory(self, directory):
@@ -155,20 +162,6 @@ class Manager(object):
             except OSError as exception:
                 print("ディレクトリの作成に失敗しました({0})".format(directory))
                 raise
-        return
-
-    def _print_progress(self, total, current=0, is_end=False):
-        """
-        進捗を表示する
-        @param total ページの総数
-        @param current 現在のページ数
-        @param 最後のページの場合は True を指定する
-        """
-        if is_end:
-            print('%d/%d' % (total, total))
-        else:
-            print('%d/%d' % (current, total), end='')
-            print('\x1B[10000D', end='', flush=True)
         return
 
     def _next(self):

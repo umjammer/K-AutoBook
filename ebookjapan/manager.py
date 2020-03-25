@@ -7,7 +7,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
 from PIL import Image
 from os import path
-
+from tqdm import tqdm
 from retry import retry
 from ebookjapan.config import Config, ImageFormat, BoundOnSide
 import os
@@ -72,6 +72,10 @@ class Manager(object):
         """
         現在表示されているページのページ番号が表示されるエレメント
         """
+        self.pbar = None
+        """
+        progress bar
+        """
 
         self._set_directory(directory)
         self._set_prefix(prefix)
@@ -121,6 +125,10 @@ class Manager(object):
         _total = self._get_total_page()
         if _total is None:
             return '全ページ数の取得に失敗しました'
+
+        _excludes = self._get_blank_check_exclude_pages(_total)
+        print(f'excludes: {_excludes}')
+
         self.current_page_element = self._get_current_page_element()
         if self.current_page_element is None:
             return '現在のページ情報の取得に失敗しました'
@@ -134,14 +142,15 @@ class Manager(object):
             self.config.sleep_time if self.config is not None else 0.5)
         self._move_first_page()
         time.sleep(_sleep_time)
+
         _current = 1
         _count = 0
+        self.pbar = tqdm(total=_total, bar_format='{n_fmt}/{total_fmt}')
         while True:
-            self._print_progress(_total, _current)
-
-            _image = self._trimming(_count, _current in (2, _total - 2, _total - 1))
+            _image = self._trimming(_count, _count in _excludes)
             _name = '%s%s%03d%s' % (self.directory, self.prefix, _count, _extension)
             _image.save(_name, _format.upper())
+            self.pbar.update(1)
 
             if _current < _total:
                 self._next()
@@ -153,8 +162,12 @@ class Manager(object):
 
             _current = self._get_current_page()
             _count = _count + 1
-        self._print_progress(_total, is_end=True)
+
+        print('', flush=True)
         return True
+
+    def _get_blank_check_exclude_pages(self, _total):
+        return [(_total - 1 + p) if p <= 0 else p for p in self.config.blank_check_excludes]
 
     def _get_total_page(self):
         """
@@ -203,21 +216,6 @@ class Manager(object):
                 raise
         return
 
-    @staticmethod
-    def _print_progress(total, current=0, is_end=False):
-        """
-        進捗を表示する
-        @param total ページの総数
-        @param current 現在のページ数
-        @param 最後のページの場合は True を指定する
-        """
-        if is_end:
-            print('%d/%d' % (total, total))
-        else:
-            print('%d/%d' % (current, total), end='')
-            print('\x1B[10000D', end='', flush=True)
-        return
-
     @retry(tries=10, delay=1)
     def _trimming(self, current, ignore_blank):
         """
@@ -255,7 +253,7 @@ class Manager(object):
             _image = _image.convert('RGB')
 
         if self._is_blank_image(_image):
-            print(f'blank page detected: {current}')
+            print(' blank page detected')
             if not ignore_blank:
                 raise Exception
 

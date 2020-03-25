@@ -1,21 +1,20 @@
 # --- coding: utf-8 ---
 """
-linemanga の実行クラスモジュール
+line-manga の実行クラスモジュール
 """
 
-import sys
-from doctest import Example
 from os import path
 from datetime import datetime
 from runner import AbstractRunner
 from linemanga.login import LineLogin
 from linemanga.manager import Manager
+from linemanga.config import Config as LinemangaConfig
 import time
 
 
 class Runner(AbstractRunner):
     """
-    linemanga の実行クラス
+    line-manga の実行クラス
     https://manga.line.me/book/viewer?id=92dc0b4e-c5d4-4518-9fba-d78fb1e6b0f0
     """
 
@@ -34,9 +33,9 @@ class Runner(AbstractRunner):
     サポートするドメイン
     """
 
-    patterns = ['book\\/viewer\\?id=[0-9a-f-]+']
+    patterns = ['book\\/viewer\\?id=([0-9a-zA-Z-]+)']
     """
-    サポートする linemanga のパスの正規表現のパターンのリスト
+    サポートする line-manga のパスの正規表現のパターンのリスト
     """
 
     is_login = False
@@ -50,17 +49,21 @@ class Runner(AbstractRunner):
 
     def run(self):
         """
-        linemanga の実行
+        line-manga の実行
         """
+        self.sub_config = LinemangaConfig()
+        if 'linemanga' in self.config.raw:
+            self.sub_config.update(self.config.raw['linemanga'])
+
         try:
             self.browser.driver.get('https://manga.line.me/')
             self.browser.driver.delete_all_cookies()
-            self._add_cookies(self.browser.driver, self._get_cookie_dict(self.config.linemanga.cookie))
+            self._add_cookies(self.browser.driver, self._get_cookie_dict(self.sub_config.cookie))
 
             self.browser.driver.get('https://manga.line.me/store/')
             time.sleep(1)
 
-            if (self.config.linemanga.needs_login and
+            if (self.sub_config.needs_login and
                     not self._is_login() and not self._login()):
                 return
         except Exception as err:
@@ -74,10 +77,11 @@ class Runner(AbstractRunner):
         print('Open main page')
 
 #        _destination = input('Output Path > ')
-        _destination = self.url[self.url.rindex('=') + 1:]
+        _destination = self.get_id()
         print(f'Output Path : {_destination}')
+
         _manager = Manager(
-            self.browser, self.config.linemanga, _destination)
+            self.browser, self.sub_config, _destination)
         _result = _manager.start()
         if _result is not True:
             print(_result)
@@ -92,7 +96,7 @@ class Runner(AbstractRunner):
             return True
         self.browser.driver.get('https://manga.line.me/')
         time.sleep(1)
-        #print(self.browser.driver.page_source)
+#        print(self.browser.driver.page_source)
         try:
             a = self.browser.driver.find_element_by_xpath("//a[text() = 'ログイン']")
             self.login_url = a.get_attribute('href')
@@ -108,12 +112,12 @@ class Runner(AbstractRunner):
         ログイン処理を行う
         @return ログイン成功時に True を返す
         """
-        if self.config.linemanga.username and self.config.linemanga.password:
+        if self.sub_config.username and self.sub_config.password:
             line = LineLogin(
                 self.browser,
                 self.login_url,
-                self.config.linemanga.username,
-                self.config.linemanga.password)
+                self.sub_config.username,
+                self.sub_config.password)
         else:
             line = LineLogin(self.browser)
         if line.login():
@@ -133,5 +137,5 @@ class Runner(AbstractRunner):
     @staticmethod
     def _add_cookies(driver, cookies):
         for i in cookies:
-            #print(f"{i}: {cookies[i]}")
+            # print(f"{i}: {cookies[i]}")
             driver.add_cookie({'name': i, 'value': cookies[i]})

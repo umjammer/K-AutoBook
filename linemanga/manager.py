@@ -1,6 +1,6 @@
 # --- coding: utf-8 ---
 """
-linemanga の操作を行うためのクラスモジュール
+line-manga の操作を行うためのクラスモジュール
 """
 
 from selenium.webdriver.common.action_chains import ActionChains
@@ -10,11 +10,12 @@ from os import path
 from linemanga.config import Config, ImageFormat
 import os
 import time
+from tqdm import tqdm
 
 
 class Manager(object):
     """
-    linemanga の操作を行うためのクラス
+    line-manga の操作を行うためのクラス
     """
 
     IMAGE_DIRECTORY = '/tmp/k/'
@@ -29,7 +30,7 @@ class Manager(object):
 
     def __init__(self, browser, config=None, directory='./', prefix=''):
         """
-        linemanga の操作を行うためのコンストラクタ
+        line-manga の操作を行うためのコンストラクタ
         @param browser splinter のブラウザインスタンス
         """
         self.browser = browser
@@ -38,7 +39,7 @@ class Manager(object):
         """
         self.config = config if isinstance(config, Config) else None
         """
-        ebookjapan の設定情報
+        line-manga の設定情報
         """
         self.directory = None
         """
@@ -114,7 +115,7 @@ class Manager(object):
         _total = self._get_total_page()
         if _total is None:
             return '全ページ数の取得に失敗しました'
-        print(f'total: {_total}')
+        # print(f'total: {_total}')
         self.current_page_element = self._get_current_page_element()
         if self.current_page_element is None:
             return '現在のページ情報の取得に失敗しました'
@@ -135,8 +136,10 @@ class Manager(object):
         self.browser.driver.set_window_size(int(_dummy_canvas.get_attribute('width')),
                                             int(_dummy_canvas.get_attribute('height')))
         print(f'size: {_dummy_canvas.get_attribute("width")}x{_dummy_canvas.get_attribute("height")}')
+
+        self.pbar = tqdm(total=_total, bar_format='{n_fmt}/{total_fmt}')
+
         while True:
-            self._print_progress(_total, _current)
 
             _temporary_page = Manager.IMAGE_DIRECTORY + 'K-AutoBook.png'
             self.browser.driver.save_screenshot(_temporary_page)
@@ -147,6 +150,7 @@ class Manager(object):
                     self.config.image_format == ImageFormat.JPEG):
                 _image = _image.convert('RGB')
             _image.save(_name, self._get_save_format().upper())
+            self.pbar.update(1)
             if _current == _total:
                 break
             self._next()
@@ -154,7 +158,7 @@ class Manager(object):
             _current = self._get_current_page()
             _count = _count + 1
 
-        self._print_progress(_total, is_end=True)
+        print('', flush=True)
         return True
 
     def _get_total_page(self):
@@ -167,7 +171,7 @@ class Manager(object):
         if len(_elements) == 0:
             return None
         for _ in range(Manager.MAX_LOADING_TIME):
-            print(_elements.first.html)
+            # print(_elements.first.html)
             if _elements.first.html != '0':
                 return int(_elements.first.html)
             time.sleep(1)
@@ -187,7 +191,7 @@ class Manager(object):
         現在のページを取得する
         @return 現在表示されているページ
         """
-#        print(int(self.current_page_element.html))
+        # print(int(self.current_page_element.html))
         return int(self.current_page_element.html)
 
     @staticmethod
@@ -204,21 +208,6 @@ class Manager(object):
                 raise
         return
 
-    @staticmethod
-    def _print_progress(total, current=0, is_end=False):
-        """
-        進捗を表示する
-        @param total ページの総数
-        @param current 現在のページ数
-        @param 最後のページの場合は True を指定する
-        """
-        if is_end:
-            print('%d/%d' % (total, total))
-        else:
-            print('%d/%d' % (current, total), end='')
-            print('\x1B[10000D', end='', flush=True)
-        return
-
     def _next(self):
         """
         次のページに進む
@@ -226,8 +215,8 @@ class Manager(object):
         next_page = self.browser.driver.find_element_by_css_selector("div.fnViewerContainer")
         ActionChains(self.browser.driver).move_to_element(
             next_page).send_keys(Keys.ARROW_LEFT).perform()
-        #_current = self._get_current_page()
-        #WebDriverWait(self.browser.driver, 30).until_not(lambda x: self._get_current_page() == _current + 1)
+        # _current = self._get_current_page()
+        # WebDriverWait(self.browser.driver, 30).until_not(lambda x: self._get_current_page() == _current + 1)
 
     def _get_extension(self):
         """

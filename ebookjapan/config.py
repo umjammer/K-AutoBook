@@ -75,6 +75,10 @@ class Config(object):
         width: 横幅
         height: 高さ
         """
+        self.blank_check_excludes = set()
+        """
+        black page checking excludes pages, negative number means (total - negative_number)
+        """
         if isinstance(data, dict):
             self.update(data)
         return
@@ -96,6 +100,8 @@ class Config(object):
             self.sleep_time = data['sleep_time']
         if 'bound_on_side' in data:
             self._set_bound_on_side(data['bound_on_side'])
+        if 'blank_check_excludes' in data:
+            self.blank_check_excludes = eval(data['blank_check_excludes'])
         if 'window_size' in data:
             if 'width' in data['window_size']:
                 self.window_size['width'] = int(data['window_size']['width'])

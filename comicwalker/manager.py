@@ -10,7 +10,7 @@ import os
 import struct
 import time
 from os import path
-
+from tqdm import tqdm
 import requests
 from requests.adapters import HTTPAdapter
 
@@ -46,6 +46,10 @@ class Manager(object):
         self.cid = directory
         """
         cid
+        """
+        self.pbar = None
+        """
+        progress bar
         """
 
         self._set_directory(directory)
@@ -96,8 +100,11 @@ class Manager(object):
         _sleep_time = (self.config.sleep_time if self.config is not None else 0.5)
         time.sleep(_sleep_time)
 
+        self.pbar = tqdm(bar_format='{n_fmt}/{total_fmt}')
+
         self.fetch_episode(s, self.directory, self.cid)
-        self._print_progress(-1, is_end=True)
+
+        print('', flush=True)
         return True
 
     @staticmethod
@@ -112,21 +119,6 @@ class Manager(object):
             except OSError as exception:
                 print("ディレクトリの作成に失敗しました({0})".format(directory))
                 raise
-        return
-
-    @staticmethod
-    def _print_progress(total, current=0, is_end=False):
-        """
-        進捗を表示する
-        @param total ページの総数
-        @param current 現在のページ数
-        @param 最後のページの場合は True を指定する
-        """
-        if is_end:
-            print('%d/%d' % (total, total))
-        else:
-            print('%d/%d' % (current, total), end='')
-            print('\x1B[10000D', end='', flush=True)
         return
 
     def _get_extension(self):
@@ -168,14 +160,13 @@ class Manager(object):
     def fetch_page(self, session, title, page, count):
         # pid = page['id']
         fn = os.path.join(title, '%03d' % count + self._get_extension())
-        print(fn)
         with open(fn, 'wb') as f:
             url = page['meta']['source_url']
             key = Manager.generate(page['meta']['drm_hash'][:16])
             resp = session.get(url, stream=True, timeout=30)
             for i, c in enumerate(resp.content):
                 f.write(struct.pack('B', c ^ key[i % 8]))
-        Manager._print_progress(-1, count, False)
+            self.pbar.update(1)
 
     def fetch_episode(self, session, title, cid):
         resp = session.get('https://ssl.seiga.nicovideo.jp/api/v1/comicwalker/episodes/' + cid + '/frames', timeout=30)

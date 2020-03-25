@@ -13,11 +13,12 @@ from bookwalker.config import Config, ImageFormat
 import base64
 import os
 import time
+from tqdm import tqdm
 
 
 class Manager(object):
     """
-    bookwalker の操作を行うためのクラス
+    book-walker の操作を行うためのクラス
     """
 
     MAX_LOADING_TIME = 10
@@ -27,7 +28,7 @@ class Manager(object):
 
     def __init__(self, browser, config=None, directory='./', prefix=''):
         """
-        bookwalker の操作を行うためのコンストラクタ
+        book-walker の操作を行うためのコンストラクタ
         @param browser splinter のブラウザインスタンス
         """
         self.browser = browser
@@ -36,7 +37,7 @@ class Manager(object):
         """
         self.config = config if isinstance(config, Config) else None
         """
-        ebookjapan の設定情報
+        book-walker の設定情報
         """
         self.directory = None
         """
@@ -57,6 +58,10 @@ class Manager(object):
         self.current_page_element = None
         """
         現在表示されているページのページ番号が表示されるエレメント
+        """
+        self.pbar = None
+        """
+        progress bar
         """
 
         self._set_directory(directory)
@@ -112,7 +117,7 @@ class Manager(object):
         _total = self._get_total_page()
         if _total is None:
             return '全ページ数の取得に失敗しました'
-        print(f'total: {_total}')
+        # print(f'total: {_total}')
         self.current_page_element = self._get_current_page_element()
         if self.current_page_element is None:
             return '現在のページ情報の取得に失敗しました'
@@ -132,9 +137,10 @@ class Manager(object):
         self.browser.driver.set_window_size(int(_dummy_canvas.get_attribute('width')),
                                             int(_dummy_canvas.get_attribute('height')))
         print(f'size: {_dummy_canvas.get_attribute("width")}x{_dummy_canvas.get_attribute("height")}')
-        while True:
-            self._print_progress(_total, _current)
 
+        self.pbar = tqdm(total=_total, bar_format='{n_fmt}/{total_fmt}')
+
+        while True:
             _name = '%s%s%03d%s' % (self.directory, self.prefix, _count, _extension)
 
             canvas = self.browser.driver.find_element_by_css_selector(
@@ -143,6 +149,7 @@ class Manager(object):
                 "return arguments[0].toDataURL('image/%s').substring(22);" % _format, canvas)
             with open(_name, 'wb') as f:
                 f.write(base64.b64decode(img_base64))
+            self.pbar.update(1)
 
             if _current == _total - 1:
                 break
@@ -153,7 +160,7 @@ class Manager(object):
             _current = self._get_current_page()
             _count = _count + 1
 
-        self._print_progress(_total, is_end=True)
+        print('', flush=True)
         return True
 
     def _get_total_page(self):
@@ -166,7 +173,7 @@ class Manager(object):
         if len(_elements) == 0:
             return None
         for _ in range(Manager.MAX_LOADING_TIME):
-            print(_elements.first.html)
+            # print(_elements.first.html)
             if _elements.first.html != '0':
                 return int(_elements.first.html.split('/')[1])
             time.sleep(1)
@@ -202,21 +209,6 @@ class Manager(object):
             except OSError as exception:
                 print("ディレクトリの作成に失敗しました({0})".format(directory))
                 raise
-        return
-
-    @staticmethod
-    def _print_progress(total, current=0, is_end=False):
-        """
-        進捗を表示する
-        @param total ページの総数
-        @param current 現在のページ数
-        @param 最後のページの場合は True を指定する
-        """
-        if is_end:
-            print('%d/%d' % (total, total))
-        else:
-            print('%d/%d' % (current, total), end='')
-            print('\x1B[10000D', end='', flush=True)
         return
 
     def _next(self):

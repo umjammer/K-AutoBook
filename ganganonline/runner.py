@@ -1,6 +1,6 @@
 # --- coding: utf-8 ---
 """
-ganganonline の実行クラスモジュール
+gangan-online の実行クラスモジュール
 """
 
 import sys
@@ -9,11 +9,12 @@ from datetime import datetime
 from runner import AbstractRunner
 from ganganonline.login import YahooLogin
 from ganganonline.manager import Manager
+from ganganonline.config import Config as GanganonlineConfig
 
 
 class Runner(AbstractRunner):
     """
-    ganganonline の実行クラス
+    gangan-online の実行クラス
     https://viewer.ganganonline.com/manga/?chapterId=15502
     """
 
@@ -32,9 +33,9 @@ class Runner(AbstractRunner):
     サポートするドメイン
     """
 
-    patterns = ['manga\\/\\?chapterId=\\d+']
+    patterns = ['manga\\/\\?chapterId=(\\d+)']
     """
-    サポートする ganganonline のパスの正規表現のパターンのリスト
+    サポートする gangan-online のパスの正規表現のパターンのリスト
     """
 
     is_login = False
@@ -44,10 +45,14 @@ class Runner(AbstractRunner):
 
     def run(self):
         """
-        ganganonline の実行
+        gangan-online の実行
         """
+        self.sub_config = GanganonlineConfig()
+        if 'ganganonline' in self.config.raw:
+            self.sub_config.update(self.config.raw['ganganonline'])
+
         try:
-            if (self.config.ebookjapan.needs_login and
+            if (self.sub_config.needs_login and
                     not self._is_login() and not self._login()):
                 return
         except Exception as err:
@@ -57,14 +62,15 @@ class Runner(AbstractRunner):
             print('ログイン時にエラーが発生しました: %s' %
                   err.with_traceback(sys.exc_info()[2]))
             return
-        print('Loading page of inputed url (%s)' % self.url)
+        print('Loading page of inputted url (%s)' % self.url)
         self.browser.visit(self.url)
 
-        _destination = self.url[self.url.rindex('chapterId=') + 10:]
+        # _destination = input('Output Path > ')
+        _destination = self.get_id()
         print(f'Output Path : {_destination}')
-#        _destination = input('Output Path > ')
+
         _manager = Manager(
-            self.browser, self.config.ganganonline, _destination)
+            self.browser, self.sub_config, _destination)
         _result = _manager.start()
         if _result is not True:
             print(_result)
@@ -88,11 +94,11 @@ class Runner(AbstractRunner):
         ログイン処理を行う
         @return ログイン成功時に True を返す
         """
-        if self.config.ganganonline.username and self.config.ganganonline.password:
+        if self.sub_config.username and self.sub_config.password:
             yahoo = YahooLogin(
                 self.browser,
-                self.config.ganganonline.username,
-                self.config.ganganonline.password)
+                self.sub_config.username,
+                self.sub_config.password)
         else:
             yahoo = YahooLogin(self.browser)
         if yahoo.login():
