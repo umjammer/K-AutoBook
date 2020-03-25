@@ -194,7 +194,7 @@ class Manager(object):
         現在のページを取得する
         @return 現在表示されているページ
         """
-#        print(int(self.current_page_element.html.split('/')[0]))
+        # print(int(self.current_page_element.html.split('/')[0]))
         return int(self.current_page_element.html.split('/')[0])
 
     @staticmethod
@@ -219,7 +219,7 @@ class Manager(object):
         ActionChains(self.browser.driver).move_to_element(
             next_page).click().send_keys(Keys.ARROW_LEFT).perform()
         _current = self._get_current_page()
-        #WebDriverWait(self.browser.driver, 30).until_not(lambda x: self._get_current_page() == _current + 1)
+        # WebDriverWait(self.browser.driver, 30).until_not(lambda x: self._get_current_page() == _current + 1)
         WebDriverWait(self.browser.driver, 30).until_not(lambda x: self._check_is_loading(
             x.find_elements_by_css_selector(".loading")))
 

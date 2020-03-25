@@ -77,7 +77,7 @@ class Config(object):
         """
         self.blank_check_excludes = set()
         """
-        black page checking excludes pages, negative number means (total - negative_number)
+        black page checking excludes pages, negative number or zero means (total - 1 + negative_number)
         """
         if isinstance(data, dict):
             self.update(data)
