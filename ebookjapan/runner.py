@@ -15,6 +15,8 @@ from ebookjapan.config import Config as EbookjapanConfig
 class Runner(AbstractRunner):
     """
     ebookjapan の実行クラス
+
+    https://ebookjapan.yahoo.co.jp/books/145222/A000100547
     """
 
     OPTION_BOUND_ON_LEFT_SIDE = 'L'
@@ -32,7 +34,7 @@ class Runner(AbstractRunner):
     サポートするドメイン
     """
 
-    patterns = ['books\\/(\\d+)']
+    patterns = ['books\\/(\\d+)\\/([A-Z]{1}\\d+)']
     """
     サポートする ebookjapan のパスの正規表現のパターンのリスト
     """
@@ -72,9 +74,10 @@ class Runner(AbstractRunner):
             print('ページの取得に失敗しました')
             return
 
-        _destination = self.url[self.url.rindex('books/') + 6:-1].replace('/', '_')
+        # _destination = input('Output Path > ')
+        _destination = self.get_id()
         print(f'Output Path : {_destination}')
-#        _destination = input('Output Path > ')
+
         _manager = Manager(
             self.browser, self.sub_config, _destination)
         _result = _manager.start()
