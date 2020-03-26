@@ -100,8 +100,6 @@ class Manager(object):
         _sleep_time = (self.config.sleep_time if self.config is not None else 0.5)
         time.sleep(_sleep_time)
 
-        self.pbar = tqdm(bar_format='{n_fmt}/{total_fmt}')
-
         self.fetch_episode(s, self.directory, self.cid)
 
         print('', flush=True)
@@ -171,5 +169,6 @@ class Manager(object):
     def fetch_episode(self, session, title, cid):
         resp = session.get('https://ssl.seiga.nicovideo.jp/api/v1/comicwalker/episodes/' + cid + '/frames', timeout=30)
         frame = json.loads(resp.text)['data']['result']
+        self.pbar = tqdm(total=len(frame), bar_format='{n_fmt}/{total_fmt}')
         for i, page in enumerate(frame):
             self.fetch_page(session, title, page, i)
