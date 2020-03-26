@@ -4,6 +4,7 @@
 import json
 import os
 import re
+import sys
 from os import path
 from splinter import Browser
 from selenium.webdriver import ChromeOptions
@@ -66,11 +67,14 @@ def _main():
     # print(f'{_plugins}')
 
     while True:
-        try:
-            _input_data = _stripper.sub('', input('Input URL > '))
-        except EOFError:
-            print("\nBye.")
-            break
+        if len(sys.argv) > 1:
+            _input_data = str.join(' ', sys.argv[1:])
+        else:
+            try:
+                _input_data = _stripper.sub('', input('Input URL > '))
+            except EOFError:
+                print("\nBye.")
+                break
 
         if _input_data == '':
             continue
