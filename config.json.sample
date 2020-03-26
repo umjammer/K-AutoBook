@@ -16,20 +16,6 @@
             "height": 1200
         }
     },
-    "bookwalker": {
-        "needs_login": false,
-        "username": "",
-        "password": "",
-        "image_format": "JPEG",
-        "sleep_time": 0.5
-    },
-    "ganganonline": {
-        "needs_login": false,
-        "username": "",
-        "password": "",
-        "image_format": "JPEG",
-        "sleep_time": 0.5
-    },
     "linemanga": {
         "needs_login": false,
         "username": "not implemented yet",
@@ -37,13 +23,6 @@
         "image_format": "JPEG",
         "sleep_time": 0.5,
         "cookie": "how to get cookie: see 'https://github.com/xuzhengyi1995/Bookwalker_Downloader' (!!! caution: target site is 'https://manga.line.me/' !!!)"
-    },
-    "comicwalker": {
-        "needs_login": false,
-        "username": "",
-        "password": "",
-        "image_format": "JPEG",
-        "sleep_time": 0.5
     },
     "zebrackcomic": {
         "needs_login": false,

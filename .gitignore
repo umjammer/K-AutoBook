@@ -7,3 +7,7 @@ logs
 
 *.png
 *.jpg
+
+tmp/
+
+run.sh
