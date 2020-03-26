@@ -103,7 +103,7 @@ class Manager(object):
         _script = self.browser.find_by_id('episode-json').first._element
         _json = json.loads(_script.get_attribute('data-value'))
 
-        _pages = _json['readableProduct']['pageStructure']['pages']
+        _pages = [x for x in _json['readableProduct']['pageStructure']['pages'] if x['type'] == 'main']
         _total = len(_pages)
 
         self.pbar = tqdm(total=_total, bar_format='{n_fmt}/{total_fmt}')
@@ -112,7 +112,7 @@ class Manager(object):
         s.mount('https://', HTTPAdapter(max_retries=3))
         s.headers.update({'User-Agent': f'{self.browser.driver.execute_script("return navigator.userAgent")}'})
 
-        for i, page in enumerate([x for x in _pages if x['type'] == 'main']):
+        for i, page in enumerate(_pages):
             self.fetch_page(s, self.directory, page, i)
             self.pbar.update(1)
             time.sleep(_sleep_time)
