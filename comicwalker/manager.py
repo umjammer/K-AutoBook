@@ -166,7 +166,7 @@ class Manager(object):
             resp = session.get(url, stream=True, timeout=30)
             for i, c in enumerate(resp.content):
                 f.write(struct.pack('B', c ^ key[i % 8]))
-            self.pbar.update(1)
+        self.pbar.update(1)
 
     def fetch_episode(self, session, title, cid):
         resp = session.get('https://ssl.seiga.nicovideo.jp/api/v1/comicwalker/episodes/' + cid + '/frames', timeout=30)

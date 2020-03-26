@@ -2,12 +2,10 @@
 """
 bookwalkerを使用するためにアカウントでログインするためのクラスモジュール
 """
-from selenium.common.exceptions import InvalidElementStateException
+
 from getpass import getpass
 from urllib import request
 from PIL import Image
-from os import path
-import os
 import io
 import time
 

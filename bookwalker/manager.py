@@ -1,6 +1,6 @@
 # --- coding: utf-8 ---
 """
-bookwalker の操作を行うためのクラスモジュール
+book-walker の操作を行うためのクラスモジュール
 
 @see https://github.com/xuzhengyi1995/Bookwalker_Downloader
 """
@@ -88,7 +88,7 @@ class Manager(object):
         while path.exists(_base_path + str(i)):
             i = i + 1
         self.directory = _base_path + str(i) + '/'
-        print("Change output directory to '%s' because '%s' alreadly exists"
+        print("Change output directory to '%s' because '%s' already exists"
               % (self.directory, directory))
         return
 
@@ -132,8 +132,7 @@ class Manager(object):
         _count = 0
 
         # get original size?
-        _dummy_canvas = self.browser.driver.find_element_by_css_selector(
-            "canvas.dummy")
+        _dummy_canvas = self.browser.driver.find_element_by_css_selector("canvas.dummy")
         self.browser.driver.set_window_size(int(_dummy_canvas.get_attribute('width')),
                                             int(_dummy_canvas.get_attribute('height')))
         print(f'size: {_dummy_canvas.get_attribute("width")}x{_dummy_canvas.get_attribute("height")}')
@@ -143,8 +142,7 @@ class Manager(object):
         while True:
             _name = '%s%s%03d%s' % (self.directory, self.prefix, _count, _extension)
 
-            canvas = self.browser.driver.find_element_by_css_selector(
-                ".currentScreen canvas")
+            canvas = self.browser.driver.find_element_by_css_selector(".currentScreen canvas")
             img_base64 = self.browser.driver.execute_script(
                 "return arguments[0].toDataURL('image/%s').substring(22);" % _format, canvas)
             with open(_name, 'wb') as f:
