@@ -2,7 +2,7 @@
 """
 comicwalker の実行クラスモジュール
 """
-import re
+
 import sys
 from os import path
 from datetime import datetime
@@ -42,15 +42,12 @@ class Runner(AbstractRunner):
             self.sub_config.update(self.config.raw['comicwalker'])
 
         try:
-            if (self.sub_config.needs_login and
-                    not self._is_login() and not self._login()):
+            if self.sub_config.needs_login and not self._is_login() and not self._login():
                 return
         except Exception as err:
             _filename = 'login_error_%s.png' % datetime.now().strftime('%s')
-            self.browser.driver.save_screenshot(
-                path.join(self.config.log_directory, _filename))
-            print('ログイン時にエラーが発生しました: %s' %
-                  err.with_traceback(sys.exc_info()[2]))
+            self.browser.driver.save_screenshot(path.join(self.config.log_directory, _filename))
+            print('ログイン時にエラーが発生しました: %s' % err.with_traceback(sys.exc_info()[2]))
             return
         print('Loading page of inputted url (%s)' % self.url)
         self.browser.visit(self.url)
@@ -59,8 +56,7 @@ class Runner(AbstractRunner):
         _destination = self.get_id()
         print(f'Output Path : {_destination}')
 
-        _manager = Manager(
-            self.browser, self.sub_config, _destination)
+        _manager = Manager(self.browser, self.sub_config, _destination)
         _result = _manager.start()
         if _result is not True:
             print(_result)

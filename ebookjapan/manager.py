@@ -138,8 +138,7 @@ class Manager(object):
         self._set_bound_of_side(self._get_bound_on_side())
         _extension = self._get_extension()
         _format = self._get_save_format()
-        _sleep_time = (
-            self.config.sleep_time if self.config is not None else 0.5)
+        _sleep_time = self.config.sleep_time if self.config is not None else 0.5
         self._move_first_page()
         time.sleep(_sleep_time)
 
@@ -175,8 +174,7 @@ class Manager(object):
         最初にフッタの出し入れをする
         @return 取得成功時に全ページ数を、失敗時に None を返す
         """
-        _elements = self.browser.find_by_css(
-            '.footer__page-output > .total-pages')
+        _elements = self.browser.find_by_css('.footer__page-output > .total-pages')
         if len(_elements) == 0:
             return None
         for _ in range(Manager.MAX_LOADING_TIME):
