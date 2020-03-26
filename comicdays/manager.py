@@ -113,7 +113,7 @@ class Manager(object):
         s.headers.update({'User-Agent': f'{self.browser.driver.execute_script("return navigator.userAgent")}'})
 
         for i, page in enumerate(_pages):
-            self.fetch_page(s, self.directory, page, i)
+            self.fetch_page(s, self.directory, page['src'], i)
             self.pbar.update(1)
             time.sleep(_sleep_time)
 
@@ -175,10 +175,9 @@ class Manager(object):
             dest.paste(src.crop((n, t, n + cw, t + ch)), (o, s, o + cw, s + ch))
         return dest
 
-    def fetch_page(self, session, title, page, count):
+    def fetch_page(self, session, title, url, count):
         _temporary_page = Manager.IMAGE_DIRECTORY + 'K-AutoBook.png'
         with open(_temporary_page, 'wb') as f:
-            url = page['src']
             resp = session.get(url, stream=True, timeout=30)
             f.write(resp.content)
 

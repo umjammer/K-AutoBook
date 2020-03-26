@@ -23,7 +23,7 @@ class Runner(AbstractRunner):
     サポートするドメイン
     """
 
-    patterns = ['volume\\/(\\d+)']
+    patterns = ['volume\\/(\\d+)', 'episode\\/(\\d+)']
     """
     サポートする comic-days のパスの正規表現のパターンのリスト
     """
