@@ -3,6 +3,7 @@
 ebookjapan の実行クラスモジュール
 """
 
+import json
 import sys
 from os import path
 from datetime import datetime
@@ -51,6 +52,10 @@ class Runner(AbstractRunner):
         self.sub_config = EbookjapanConfig()
         if 'ebookjapan' in self.config.raw:
             self.sub_config.update(self.config.raw['ebookjapan'])
+
+        if self.options:
+            print(f'options: {self.options}')
+            self.sub_config.update(json.loads(self.options))
 
         try:
             if (self.sub_config.needs_login and

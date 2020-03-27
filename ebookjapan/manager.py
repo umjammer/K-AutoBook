@@ -19,7 +19,11 @@ class Manager(object):
     ebookjapanの操作を行うためのクラス
 
     trimming has eliminated.
-    you should set screen size option
+    you should set screen size option in "config.json" or write command line option like
+    ```
+    Input URL > https://ebookjapan.yahoo.co.jp/books/119594/A000048753/ {"window_size":{"width":784,"height":1200}}
+    ```
+
     how to know screen size
     F12 -> Application -> Frames/Images/'blob:https://ebookjapan.yahoo.co.jp/...'
      * click the address above
