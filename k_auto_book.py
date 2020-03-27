@@ -33,6 +33,9 @@ def _initialize_browser(config):
     log_name = path.join(config.log_directory, 'ghostdriver.log')
     if config.driver == 'chrome':
         chrome_options = ChromeOptions()
+        if config.chrome_binary:
+            print(config.chrome_binary)
+            chrome_options.binary_location = config.chrome_binary
         chrome_options.add_argument('high-dpi-support=1')
         chrome_options.add_argument('device-scale-factor=1')
         chrome_options.add_argument('force-device-scale-factor=1')

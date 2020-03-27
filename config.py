@@ -15,9 +15,16 @@ class Config(object):
         @param data 設定情報
         """
         self.driver = 'phantomjs'
-        self.chrome_path = '/usr/local/bin/chromedriver'
         """
         開くブラウザのドライバ
+        """
+        self.chrome_path = None
+        """
+        currently no mean
+        """
+        self.chrome_binary = None
+        """
+        chrome binary
         """
         self.user_agent = (
             'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_5) ' +
@@ -53,6 +60,8 @@ class Config(object):
             self.user_agent = data['user_agent']
         if 'chrome_path' in data:
             self.chrome_path = data['chrome_path']
+        if 'chrome_binary' in data:
+            self.chrome_binary = data['chrome_binary']
         if 'headless' in data:
             self.headless = bool(data['headless'])
         if 'log_directory' in data:
