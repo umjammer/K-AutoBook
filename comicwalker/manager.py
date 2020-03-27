@@ -13,7 +13,6 @@ from os import path
 from tqdm import tqdm
 import requests
 from requests.adapters import HTTPAdapter
-
 from comicwalker.config import Config, ImageFormat
 
 
@@ -90,17 +89,14 @@ class Manager(object):
         ページの自動スクリーンショットを開始する
         @return エラーが合った場合にエラーメッセージを、成功時に True を返す
         """
-        s = requests.session()
-        s.mount('https://', HTTPAdapter(max_retries=3))
-        s.headers.update({'User-Agent': f'{self.browser.driver.execute_script("return navigator.userAgent;")}'})
+        session = requests.session()
+        session.mount('https://', HTTPAdapter(max_retries=3))
+        session.headers.update({'User-Agent': f'{self.browser.driver.execute_script("return navigator.userAgent;")}'})
 
         time.sleep(2)
         self._check_directory(self.directory)
 
-        _sleep_time = (self.config.sleep_time if self.config is not None else 0.5)
-        time.sleep(_sleep_time)
-
-        self.fetch_episode(s, self.directory, self.cid)
+        self.fetch_episode(session, self.directory, self.cid)
 
         print('', flush=True)
         return True
@@ -164,7 +160,6 @@ class Manager(object):
             resp = session.get(url, stream=True, timeout=30)
             for i, c in enumerate(resp.content):
                 f.write(struct.pack('B', c ^ key[i % 8]))
-        self.pbar.update(1)
 
     def fetch_episode(self, session, title, cid):
         resp = session.get('https://ssl.seiga.nicovideo.jp/api/v1/comicwalker/episodes/' + cid + '/frames', timeout=30)
@@ -172,3 +167,5 @@ class Manager(object):
         self.pbar = tqdm(total=len(frame), bar_format='{n_fmt}/{total_fmt}')
         for i, page in enumerate(frame):
             self.fetch_page(session, title, page, i)
+            self.pbar.update(1)
+            time.sleep(self.config.sleep_time if self.config is not None else 0.5)

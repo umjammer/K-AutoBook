@@ -9,10 +9,12 @@ import json
 import math
 import os
 import time
+from io import BytesIO
 import requests
 from os import path
-from tqdm import tqdm
+
 from requests.adapters import HTTPAdapter
+from tqdm import tqdm
 from PIL import Image
 from comicdays.config import Config, ImageFormat
 
@@ -108,12 +110,12 @@ class Manager(object):
 
         self.pbar = tqdm(total=_total, bar_format='{n_fmt}/{total_fmt}')
 
-        s = requests.session()
-        s.mount('https://', HTTPAdapter(max_retries=3))
-        s.headers.update({'User-Agent': f'{self.browser.driver.execute_script("return navigator.userAgent")}'})
+        session = requests.session()
+        session.mount('https://', HTTPAdapter(max_retries=3))
+        session.headers.update({'User-Agent': f'{self.browser.driver.execute_script("return navigator.userAgent;")}'})
 
         for i, page in enumerate(_pages):
-            self.fetch_page(s, self.directory, page['src'], i)
+            self.fetch_page(session, self.directory, page['src'], i)
             self.pbar.update(1)
             time.sleep(_sleep_time)
 
@@ -176,11 +178,6 @@ class Manager(object):
         return dest
 
     def fetch_page(self, session, title, url, count):
-        _temporary_page = Manager.IMAGE_DIRECTORY + 'K-AutoBook.png'
-        with open(_temporary_page, 'wb') as f:
-            resp = session.get(url, stream=True, timeout=30)
-            f.write(resp.content)
-
-        _image = self.decrypt_image(Image.open(_temporary_page))
+        _image = self.decrypt_image(Image.open(BytesIO(session.get(url).content)))
         _name = os.path.join(title, '%03d' % count + self._get_extension())
         _image.save(_name, self._get_save_format().upper())

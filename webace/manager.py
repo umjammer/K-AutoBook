@@ -2,11 +2,14 @@
 """
 web-ace の操作を行うためのクラスモジュール
 """
-import io
 
+import io
 import requests
 from PIL import Image
 from os import path
+
+from requests.adapters import HTTPAdapter
+
 from webace.config import Config, ImageFormat
 import os
 import time
@@ -119,6 +122,10 @@ class Manager(object):
                 break
             last_height = new_height
 
+        session = requests.session()
+        session.mount('https://', HTTPAdapter(max_retries=3))
+        session.headers.update({'User-Agent': f'{self.browser.driver.execute_script("return navigator.userAgent;")}'})
+
         imgs = self.browser.find_by_css("img.viewerFixedImage")
         _count = 0
         _total = len(imgs)
@@ -128,7 +135,7 @@ class Manager(object):
 
             _url = img._element.get_attribute('src')
             # print(_url)
-            _image = Image.open(io.BytesIO(requests.get(_url).content))
+            _image = Image.open(io.BytesIO(session.get(_url).content))
             if self.config is not None and (self.config.image_format == ImageFormat.JPEG):
                 _image = _image.convert('RGB')
             _image.save(_name, _format.upper())
