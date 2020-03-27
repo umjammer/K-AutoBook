@@ -96,7 +96,7 @@ class Manager(object):
         ページの自動スクリーンショットを開始する
         @return エラーが合った場合にエラーメッセージを、成功時に True を返す
         """
-        self.browser.driver.set_window_size(460, 600)
+        self.browser.driver.set_window_size(480, 640)
 
         time.sleep(5)
         self._check_directory(self.directory)

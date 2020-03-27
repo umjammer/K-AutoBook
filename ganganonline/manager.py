@@ -116,7 +116,7 @@ class Manager(object):
         ページの自動スクリーンショットを開始する
         @return エラーが合った場合にエラーメッセージを、成功時に True を返す
         """
-        self.browser.driver.set_window_size(460, 600)
+        self.browser.driver.set_window_size(480, 640)
 
         time.sleep(2)
         self._check_directory(self.directory)
@@ -129,8 +129,6 @@ class Manager(object):
         _count = 0
         self.pbar = tqdm(bar_format='{n_fmt}/{total_fmt}')
         while True:
-            _name = '%s%s%03d%s' % (
-                self.directory, self.prefix, _count, _extension)
 
             img = self.browser.driver.find_element_by_xpath("//img[starts-with(@src, 'blob:')]")
             try:
@@ -139,6 +137,7 @@ class Manager(object):
             except:
                 image = self._get_file_content_chrome(img.get_attribute('src'))
                 if _count != 0:
+                    _name = '%s%s%03d%s' % (self.directory, self.prefix, _count, _extension)
                     with open(_name, 'wb') as f:
                         f.write(image)
                     self.pbar.update(1)
@@ -151,7 +150,8 @@ class Manager(object):
         print('', flush=True)
         return True
 
-    def _check_directory(self, directory):
+    @staticmethod
+    def _check_directory(directory):
         """
         ディレクトリの存在を確認して，ない場合はそのディレクトリを作成する
         @param directory 確認するディレクトリのパス

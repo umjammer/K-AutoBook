@@ -144,15 +144,16 @@ class Manager(object):
             _temporary_page = Manager.IMAGE_DIRECTORY + 'K-AutoBook.png'
             self.browser.driver.save_screenshot(_temporary_page)
             _image = Image.open(_temporary_page)
-            _name = '%s%s%03d%s' % (
-                self.directory, self.prefix, _count, _extension)
-            if self.config is not None and (
-                    self.config.image_format == ImageFormat.JPEG):
+            if self.config is not None and (self.config.image_format == ImageFormat.JPEG):
                 _image = _image.convert('RGB')
+
+            _name = '%s%s%03d%s' % (self.directory, self.prefix, _count, _extension)
             _image.save(_name, self._get_save_format().upper())
             self.pbar.update(1)
+
             if _current == _total:
                 break
+
             self._next()
             time.sleep(_sleep_time)
             _current = self._get_current_page()

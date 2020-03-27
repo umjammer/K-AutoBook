@@ -24,14 +24,9 @@ class Manager(object):
     comic-days の操作を行うためのクラス
     """
 
-    IMAGE_DIRECTORY = '/tmp/k/'
-    """
-    画像を一時的に保存するディレクトリ
-    """
-
     def __init__(self, browser, config=None, directory='./', prefix=''):
         """
-        comicdays の操作を行うためのコンストラクタ
+        comic-days の操作を行うためのコンストラクタ
         @param browser splinter のブラウザインスタンス
         """
         self.browser = browser
