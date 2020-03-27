@@ -3,35 +3,34 @@
 ebookjapanの操作を行うためのクラスモジュール
 """
 
+import base64
+import io
+import time
+from os import path, listdir, makedirs
+from PIL import Image
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
-from PIL import Image
-from os import path
 from tqdm import tqdm
-from retry import retry
 from ebookjapan.config import Config, ImageFormat, BoundOnSide
-import os
-import time
 
 
 class Manager(object):
     """
     ebookjapanの操作を行うためのクラス
-    """
 
-    IMAGE_DIRECTORY = '/tmp/k/'
-    """
-    画像を一時的に保存するディレクトリ
-    """
+    trimming has eliminated.
+    you should set screen size option
+    how to know screen size
+    F12 -> Application -> Frames/Images/'blob:https://ebookjapan.yahoo.co.jp/...'
+     * click the address above
+     * left pane, encrypted image would be shown, status bar, image size would be shown
+     * we'd like to use this size, but we need some calculation for height (like 1248 -> 1200, 1672 -> 1600?, etc.)
+     * for width, we can find from the html source, css selector: "canvas", attribute: "width"
+    the calculation rule is unknown, i use practical values.
+    if we want to get original size, we need to decrypt images
+    i know how to decrypt images but i don't know how to get images...
 
-    CHECK_Y = 100
-    """
-    画像の色の判定を行う Y 座標
-    """
-
-    BACKGEROUND_COLOR = '#FEFFFD'
-    """
-    トリミングを容易にするための背景色
+    i really not recommend to use this plugin, use original version of ebookjapan, it's safety.
     """
 
     MAX_LOADING_TIME = 10
@@ -97,6 +96,10 @@ class Manager(object):
             self.directory = _base_path + '/'
             return
         else:
+            if not len(listdir(_base_path)):
+                print(f"Output directory {_base_path} exists but empty")
+                self.directory = _base_path + '/'
+                return
             _base_path = _base_path + '-'
         i = 1
         while path.exists(_base_path + str(i)):
@@ -118,22 +121,17 @@ class Manager(object):
         ページの自動スクリーンショットを開始する
         @return エラーが合った場合にエラーメッセージを、成功時に True を返す
         """
+        # resize by option
         self.browser.driver.set_window_size(self.config.window_size['width'], self.config.window_size['height'])
-        print(f'{self.config.window_size["width"]}x{self.config.window_size["height"]}')
 
         time.sleep(2)
         _total = self._get_total_page()
         if _total is None:
             return '全ページ数の取得に失敗しました'
 
-        _excludes = self._get_blank_check_exclude_pages(_total)
-        print(f'excludes: {_excludes}')
-
         self.current_page_element = self._get_current_page_element()
         if self.current_page_element is None:
             return '現在のページ情報の取得に失敗しました'
-        self._change_background_color()
-        self._check_directory(Manager.IMAGE_DIRECTORY)
         self._check_directory(self.directory)
         self._set_bound_of_side(self._get_bound_on_side())
         _extension = self._get_extension()
@@ -142,11 +140,23 @@ class Manager(object):
         self._move_first_page()
         time.sleep(_sleep_time)
 
+        # re-resize by source
+        _canvas = self.browser.find_by_css('canvas').first._element
+        _width = _canvas.get_attribute('width')
+        self.browser.driver.set_window_size(_width, self.config.window_size['height'])
+        print(f'{_width}x{self.config.window_size["height"]}')
+
         _current = 1
         _count = 0
         self.pbar = tqdm(total=_total, bar_format='{n_fmt}/{total_fmt}')
+
         while True:
-            _image = self._trimming(_count, _count in _excludes)
+
+            _base64_image = self.browser.driver.get_screenshot_as_base64()
+            _image = Image.open(io.BytesIO(base64.b64decode(_base64_image)))
+            if self.config is not None and (self.config.image_format == ImageFormat.JPEG):
+                _image = _image.convert('RGB')
+
             _name = '%s%s%03d%s' % (self.directory, self.prefix, _count, _extension)
             _image.save(_name, _format.upper())
             self.pbar.update(1)
@@ -208,54 +218,11 @@ class Manager(object):
         """
         if not path.isdir(directory):
             try:
-                os.makedirs(directory)
+                makedirs(directory)
             except OSError as exception:
                 print("ディレクトリの作成に失敗しました({0})".format(directory))
                 raise
         return
-
-    @retry(tries=10, delay=1)
-    def _trimming(self, current, ignore_blank):
-        """
-        画像の両端の色と異なる色になる場所でトリミングする
-        @param current ページ番号
-        @param ignore_blank キャプチャミスを無視するかどうか
-        """
-        _temporary_page = Manager.IMAGE_DIRECTORY + 'K-AutoBook.png'
-        self.browser.driver.save_screenshot(_temporary_page)
-        _image = Image.open(_temporary_page)
-
-        _width, _height = _image.size
-        _start_x = 0
-        _end_x = _width
-        _bases = set()
-        for _point_y in range(_height):
-            _bases.add(_image.getpixel((0, _point_y)))
-            _bases.add(_image.getpixel((_width - 1, _point_y)))
-        for _point_x in range(_width):
-            _pixel = _image.getpixel((_point_x, Manager.CHECK_Y))
-            if _pixel not in _bases:
-                _start_x = _point_x
-                break
-        for _point_x in range(_width)[::-1]:
-            _pixel = _image.getpixel((_point_x, Manager.CHECK_Y))
-            if _pixel not in _bases:
-                _end_x = _point_x + 1
-                break
-        if _start_x != 0:
-            _start_x = _start_x + 58
-            _end_x = _end_x - 58
-        _image = _image.crop((_start_x, 0, _end_x, _height))
-        if self.config is not None and (
-                self.config.image_format == ImageFormat.JPEG):
-            _image = _image.convert('RGB')
-
-        if self._is_blank_image(_image):
-            print(' blank page detected')
-            if not ignore_blank:
-                raise Exception
-
-        return _image
 
     @staticmethod
     def _is_blank_image(image):
@@ -295,17 +262,6 @@ class Manager(object):
         指定したキーを押す
         """
         ActionChains(self.browser.driver).key_down(key).perform()
-        return
-
-    def _change_background_color(self):
-        """
-        表示されている漫画ページの背景色を変更する
-        """
-
-        _script = (
-            "document.body.style.backgroundColor = '%s'"
-            % Manager.BACKGEROUND_COLOR)
-        self.browser.evaluate_script(_script)
         return
 
     def _get_extension(self):

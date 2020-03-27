@@ -10,7 +10,6 @@
         "image_format": "JPEG",
         "sleep_time": 0.5,
         "bound_on_side": "right",
-        "blank_check_excludes": "(1, -1, 0)",
         "window_size": {
             "width": 960,
             "height": 1200
