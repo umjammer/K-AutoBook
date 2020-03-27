@@ -8,6 +8,7 @@ import io
 import time
 from os import path, listdir, makedirs
 from PIL import Image
+from retry import retry
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
 from tqdm import tqdm
@@ -133,6 +134,9 @@ class Manager(object):
         if _total is None:
             return '全ページ数の取得に失敗しました'
 
+        _excludes = self._get_blank_check_exclude_pages(_total)
+        print(f'excludes: {_excludes}')
+
         self.current_page_element = self._get_current_page_element()
         if self.current_page_element is None:
             return '現在のページ情報の取得に失敗しました'
@@ -150,17 +154,16 @@ class Manager(object):
         self.browser.driver.set_window_size(_width, self.config.window_size['height'])
         print(f'{_width}x{self.config.window_size["height"]}')
 
+        while self._get_current_page() != 1:
+            time.sleep(0.1)
+
         _current = 1
         _count = 0
         self.pbar = tqdm(total=_total, bar_format='{n_fmt}/{total_fmt}')
 
         while True:
 
-            _base64_image = self.browser.driver.get_screenshot_as_base64()
-            _image = Image.open(io.BytesIO(base64.b64decode(_base64_image)))
-            if self.config is not None and (self.config.image_format == ImageFormat.JPEG):
-                _image = _image.convert('RGB')
-
+            _image = self._capture(_count in _excludes)
             _name = '%s%s%03d%s' % (self.directory, self.prefix, _count, _extension)
             _image.save(_name, _format.upper())
             self.pbar.update(1)
@@ -227,6 +230,23 @@ class Manager(object):
                 print("ディレクトリの作成に失敗しました({0})".format(directory))
                 raise
         return
+
+    @retry(tries=10, delay=1)
+    def _capture(self, ignore_blank):
+        """
+        @param ignore_blank キャプチャミスを無視するかどうか
+        """
+        _base64_image = self.browser.driver.get_screenshot_as_base64()
+        _image = Image.open(io.BytesIO(base64.b64decode(_base64_image)))
+        if self.config is not None and (self.config.image_format == ImageFormat.JPEG):
+            _image = _image.convert('RGB')
+
+        if self._is_blank_image(_image):
+            print(' blank page detected')
+            if not ignore_blank:
+                raise Exception
+
+        return _image
 
     @staticmethod
     def _is_blank_image(image):
