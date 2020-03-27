@@ -130,10 +130,10 @@ class Manager(object):
             _name = '%s%s%03d%s' % (self.directory, self.prefix, _count, _extension)
 
             _canvas = self.browser.find_by_css("div.page > canvas").first._element
-            img_base64 = self.browser.driver.execute_script(
+            _base64_image = self.browser.driver.execute_script(
                 "return arguments[0].toDataURL('image/%s').substring(22);" % _format, _canvas)
             with open(_name, 'wb') as f:
-                f.write(base64.b64decode(img_base64))
+                f.write(base64.b64decode(_base64_image))
             self.pbar.update(1)
 
             self._next()
