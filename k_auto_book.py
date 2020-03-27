@@ -69,10 +69,13 @@ def _main():
     _plugins = AbstractRunner.get_plugins()
     # print(f'{_plugins}')
 
+    _input_data = None
+
+    if len(sys.argv) > 1:
+        _input_data = str.join(' ', sys.argv[1:])
+
     while True:
-        if len(sys.argv) > 1:
-            _input_data = str.join(' ', sys.argv[1:])
-        else:
+        if not _input_data:
             try:
                 _input_data = _stripper.sub('', input('Input URL > '))
             except EOFError:
@@ -100,6 +103,8 @@ def _main():
             _urls = [_inputs_data[0]]
             _options = _inputs_data[1] if 1 < len(_inputs_data) else None
 
+        _input_data = None
+
         for _url in _urls:
             _done = False
             print(f'url: {_url}')
@@ -114,8 +119,6 @@ def _main():
                     _done = True
             if not _done:
                 print('入力されたURLはサポートしていません')
-
-        continue
 
 
 _main()
