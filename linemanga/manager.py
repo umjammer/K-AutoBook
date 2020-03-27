@@ -3,14 +3,17 @@
 line-manga の操作を行うためのクラスモジュール
 """
 
+import base64
+import io
+import os
+import re
+import time
+from os import path
+from PIL import Image
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
-from PIL import Image
-from os import path
-from linemanga.config import Config, ImageFormat
-import os
-import time
 from tqdm import tqdm
+from linemanga.config import Config, ImageFormat
 
 
 class Manager(object):
@@ -18,12 +21,7 @@ class Manager(object):
     line-manga の操作を行うためのクラス
     """
 
-    IMAGE_DIRECTORY = '/tmp/k/'
-    """
-    画像を一時的に保存するディレクトリ
-    """
-
-    MAX_LOADING_TIME = 10
+    MAX_LOADING_TIME = 5
     """
     初回読み込み時の最大待ち時間
     """
@@ -123,8 +121,7 @@ class Manager(object):
         self._check_directory(self.directory)
         _extension = self._get_extension()
         _format = self._get_save_format()
-        _sleep_time = (
-            self.config.sleep_time if self.config is not None else 0.5)
+        _sleep_time = self.config.sleep_time if self.config is not None else 0.5
         time.sleep(_sleep_time)
         _current = self._get_current_page()
         _count = 0
@@ -141,9 +138,8 @@ class Manager(object):
 
         while True:
 
-            _temporary_page = Manager.IMAGE_DIRECTORY + 'K-AutoBook.png'
-            self.browser.driver.save_screenshot(_temporary_page)
-            _image = Image.open(_temporary_page)
+            _base64_image = self.browser.driver.get_screenshot_as_base64()
+            _image = Image.open(io.BytesIO(base64.b64decode(_base64_image)))
             if self.config is not None and (self.config.image_format == ImageFormat.JPEG):
                 _image = _image.convert('RGB')
 
@@ -172,9 +168,9 @@ class Manager(object):
         if len(_elements) == 0:
             return None
         for _ in range(Manager.MAX_LOADING_TIME):
-            # print(_elements.first.html)
-            if _elements.first.html != '0':
-                return int(_elements.first.html)
+            # print(f'"{_elements.first.html}"')
+            if re.match(r'^\d+$', _elements.first.html.strip()):
+                return int(_elements.first.html.strip())
             time.sleep(1)
 
     def _get_current_page_element(self):
@@ -213,11 +209,11 @@ class Manager(object):
         """
         次のページに進む
         """
-        next_page = self.browser.driver.find_element_by_css_selector("div.fnViewerContainer")
-        ActionChains(self.browser.driver).move_to_element(
-            next_page).send_keys(Keys.ARROW_LEFT).perform()
-        # _current = self._get_current_page()
-        # WebDriverWait(self.browser.driver, 30).until_not(lambda x: self._get_current_page() == _current + 1)
+        _current_page = self._get_current_page()
+        _next_page = self.browser.driver.find_element_by_css_selector("div.fnViewerContainer")
+        ActionChains(self.browser.driver).move_to_element(_next_page).send_keys(Keys.ARROW_LEFT).perform()
+        while self._get_current_page() != _current_page + 1:
+            time.sleep(0.1)
 
     def _get_extension(self):
         """
