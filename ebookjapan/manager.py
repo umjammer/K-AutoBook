@@ -80,6 +80,7 @@ class Manager(object):
         """
         progress bar
         """
+        self.retry_count = 0
 
         self._set_directory(directory)
         self._set_prefix(prefix)
@@ -162,7 +163,7 @@ class Manager(object):
         self.pbar = tqdm(total=_total, bar_format='{n_fmt}/{total_fmt}')
 
         while True:
-
+            self.retry_count = 0
             _image = self._capture(_count in _excludes)
             _name = '%s%s%03d%s' % (self.directory, self.prefix, _count, _extension)
             _image.save(_name, _format.upper())
@@ -242,9 +243,13 @@ class Manager(object):
             _image = _image.convert('RGB')
 
         if self._is_blank_image(_image):
-            print(' blank page detected')
+            print(f' blank page detected {self.retry_count}')
             if not ignore_blank:
-                raise Exception
+                if self.retry_count < self.config.blank_check_giveup:
+                    self.retry_count += 1
+                    raise Exception
+                else:
+                    print(' give up checking, ignore blank')
 
         return _image
 

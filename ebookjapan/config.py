@@ -79,6 +79,11 @@ class Config(object):
         """
         black page checking excludes pages, negative number or zero means (total - 1 + negative_number)
         """
+        self.blank_check_giveup = 11
+        """
+        black page checking give up times
+        11 is larger than retry times, means never give up, means retry error stop downloading.
+        """
         if isinstance(data, dict):
             self.update(data)
         return
@@ -102,6 +107,8 @@ class Config(object):
             self._set_bound_on_side(data['bound_on_side'])
         if 'blank_check_excludes' in data:
             self.blank_check_excludes = eval(data['blank_check_excludes'])
+        if 'blank_check_giveup' in data:
+            self.blank_check_giveup = data['blank_check_giveup']
         if 'window_size' in data:
             if 'width' in data['window_size']:
                 self.window_size['width'] = int(data['window_size']['width'])
