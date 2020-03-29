@@ -55,7 +55,6 @@ class Manager(AbstractManager):
 
             _canvas = self.browser.driver.find_element_by_css_selector(".currentScreen canvas")
             self._save_image_of_web_element(_count, _canvas)
-
             self.pbar.update(1)
 
             self._next()

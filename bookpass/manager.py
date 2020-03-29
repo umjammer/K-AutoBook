@@ -13,11 +13,6 @@ class Manager(AbstractManager):
     bookpass の操作を行うためのクラス
     """
 
-    MAX_LOADING_TIME = 5
-    """
-    初回読み込み時の最大待ち時間
-    """
-
     def __init__(self, browser, config=None, directory='./', prefix=''):
         """
         bookpass の操作を行うためのコンストラクタ

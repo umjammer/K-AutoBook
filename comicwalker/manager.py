@@ -8,8 +8,7 @@ https://github.com/YunzheZJU/ComicWalkerWalker
 import json
 import os
 import struct
-import time
-from manager import AbstractManager, get_session
+from manager import AbstractManager
 
 
 class Manager(AbstractManager):
@@ -26,7 +25,7 @@ class Manager(AbstractManager):
 
         self.cid = directory
         """
-        cid
+        cid TODO ad-hoc
         """
 
     def start(self, url=None):

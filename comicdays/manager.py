@@ -36,7 +36,7 @@ class Manager(AbstractManager):
         _pages = [x for x in _json['readableProduct']['pageStructure']['pages'] if x['type'] == 'main']
         self._set_total(len(_pages))
 
-        session = get_session(self.browser.driver.execute_script("return navigator.userAgent;"))
+        session = self._get_session()
 
         for i, page in enumerate(_pages):
             self.fetch_page(session, page['src'], i)
