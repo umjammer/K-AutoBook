@@ -18,11 +18,6 @@ class Manager(AbstractManager):
         """
         super().__init__(browser, config, directory, prefix)
 
-        self.current_page_element = None
-        """
-        現在表示されているページのページ番号が表示されるエレメント
-        """
-
     def start(self, url=None):
         """
         ページの自動スクリーンショットを開始する

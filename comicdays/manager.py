@@ -9,7 +9,7 @@ import json
 import math
 from io import BytesIO
 from PIL import Image
-from manager import AbstractManager, get_session
+from manager import AbstractManager
 
 
 class Manager(AbstractManager):
