@@ -3,13 +3,12 @@
 アルファポリスから漫画をダウンロードするためのクラスモジュール
 """
 
-from urllib import request
-from os import path
-import os
 import re
+from urllib import request
+from manager import AbstractManager
 
 
-class Manager(object):
+class Manager(AbstractManager):
     """
     アルファポリスから漫画をダウンロードするクラス
     """
@@ -18,83 +17,29 @@ class Manager(object):
         """
         アルファポリスの操作を行うためのコンストラクタ
         @param directory 出力するファイル群を置くディレクトリ
-        @param prfix 出力するファイル名のプレフィックス
+        @param prefix 出力するファイル名のプレフィックス
         """
-        self.directory = None
-        """
-        ファイルを出力するディレクトリ
-        """
-        self.prefix = None
-        """
-        出力するファイルのプレフィックス
-        """
-        self._set_directory(directory)
-        self._set_prefix(prefix)
-        return
+        super().__init__(directory=directory, prefix=prefix)
 
-    def _set_directory(self, directory):
-        """
-        ファイルを出力するディレクトリを設定する
-        """
-        self.directory = directory if (
-            directory[-1:] == '/') else directory + '/'
-        return
-
-    def _set_prefix(self, prefix):
-        """
-        出力ファイルのプレフィックス
-        """
-        self.prefix = prefix
-        return
-
-    def start(self, url):
+    def start(self, url=None):
         """
         ページの自動自動ダウンロードを開始する
         @param url アルフォポリスのコンテンツの URL
         """
-        self._check_directory(self.directory)
         _sources = self._get_image_urls(url)
         _total = len(_sources)
+        self._set_total(_total)
+
+        session = self._get_session()
+
         for _index in range(_total):
-            self._print_progress(_total, _index)
-            _response = request.urlopen(_sources[_index])
-            if _response.getcode() != 200:
-                print('画像の取得に失敗しました(%s)' % _sources[_index])
-                continue
-            with open('%s%s%03d.png' % (
-                    self.directory, self.prefix, _index), 'wb') as file:
-                file.write(_response.read())
-        self._print_progress(_total, is_end=True)
-        return
+            self._save_image_of_bytes(_index, session.get(_sources[_index]).content)
+            self.pbar.update(1)
 
-    def _check_directory(self, directory):
-        """
-        ディレクトリの存在を確認して，ない場合はそのディレクトリを作成する
-        @param directory 確認するディレクトリのパス
-        """
-        if not path.isdir(directory):
-            try:
-                os.makedirs(directory)
-            except OSError as exception:
-                print("ディレクトリの作成に失敗しました({0})".format(directory))
-                raise
-        return
+        return True
 
-    def _print_progress(self, total, current=0, is_end=False):
-        """
-        進捗を表示する
-        @param total ページの総数
-        @param current 現在のページ数
-        @param 最後のページの場合は True を指定する
-        """
-        if is_end:
-            print('%d/%d' % (total, total))
-        else:
-            print('%d/%d' % (current, total), end='')
-            print('\x1B[10000D', end='', flush=True)
-        return
-
-    def _get_image_urls(self, url):
+    @staticmethod
+    def _get_image_urls(url):
         """
         漫画画像の URL を取得する
         @param url アルファボリスで漫画を表示しているページの URL

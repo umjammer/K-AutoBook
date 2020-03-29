@@ -6,16 +6,14 @@ ebookjapanの操作を行うためのクラスモジュール
 import base64
 import io
 import time
-from os import path, listdir, makedirs
 from PIL import Image
 from retry import retry
-from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
-from tqdm import tqdm
-from ebookjapan.config import Config, ImageFormat, BoundOnSide
+from ebookjapan.config import BoundOnSide
+from manager import AbstractManager
 
 
-class Manager(object):
+class Manager(AbstractManager):
     """
     ebookjapanの操作を行うためのクラス
 
@@ -38,32 +36,13 @@ class Manager(object):
     i really not recommend to use this plugin, use original version of ebookjapan, it's safety.
     """
 
-    MAX_LOADING_TIME = 10
-    """
-    初回読み込み時の最大待ち時間
-    """
-
     def __init__(self, browser, config=None, directory='./', prefix=''):
         """
         ebookjapanの操作を行うためのコンストラクタ
         @param browser splinter のブラウザインスタンス
         """
-        self.browser = browser
-        """
-        splinter のブラウザインスタンス
-        """
-        self.config = config if isinstance(config, Config) else None
-        """
-        ebookjapan の設定情報
-        """
-        self.directory = None
-        """
-        ファイルを出力するディレクトリ
-        """
-        self.prefix = None
-        """
-        出力するファイルのプレフィックス
-        """
+        super().__init__(browser, config, directory, prefix)
+
         self.next_key = None
         """
         次のページに進むためのキー
@@ -76,64 +55,25 @@ class Manager(object):
         """
         現在表示されているページのページ番号が表示されるエレメント
         """
-        self.pbar = None
-        """
-        progress bar
-        """
         self.retry_count = 0
 
-        self._set_directory(directory)
-        self._set_prefix(prefix)
         self._set_bound_of_side(None)
-        return
 
-    def _set_directory(self, directory):
-        """
-        ファイルを出力するディレクトリを設定する
-        """
-        if directory == '':
-            self.directory = './'
-            print('Output to current directory')
-            return
-        _base_path = directory.rstrip('/')
-        if _base_path == '':
-            _base_path = '/'
-        elif not path.exists(_base_path):
-            self.directory = _base_path + '/'
-            return
-        else:
-            if not len(listdir(_base_path)):
-                print(f"Output directory {_base_path} exists but empty")
-                self.directory = _base_path + '/'
-                return
-            _base_path = _base_path + '-'
-        i = 1
-        while path.exists(_base_path + str(i)):
-            i = i + 1
-        self.directory = _base_path + str(i) + '/'
-        print("Change output directory to '%s' because '%s' alreadly exists"
-              % (self.directory, directory))
-        return
-
-    def _set_prefix(self, prefix):
-        """
-        出力ファイルのプレフィックス
-        """
-        self.prefix = prefix
-        return
-
-    def start(self):
+    def start(self, url=None):
         """
         ページの自動スクリーンショットを開始する
         @return エラーが合った場合にエラーメッセージを、成功時に True を返す
         """
+        self._wait()
+
         # resize by option
         self.browser.driver.set_window_size(self.config.window_size['width'], self.config.window_size['height'])
+        print(f'config: {self.config.window_size["width"]}x{self.config.window_size["height"]}')
 
-        time.sleep(2)
         _total = self._get_total_page()
         if _total is None:
             return '全ページ数の取得に失敗しました'
+        self._set_total(_total)
 
         _excludes = self._get_blank_check_exclude_pages(_total)
         print(f'excludes: {_excludes}')
@@ -141,46 +81,31 @@ class Manager(object):
         self.current_page_element = self._get_current_page_element()
         if self.current_page_element is None:
             return '現在のページ情報の取得に失敗しました'
-        self._check_directory(self.directory)
+
         self._set_bound_of_side(self._get_bound_on_side())
-        _extension = self._get_extension()
-        _format = self._get_save_format()
-        _sleep_time = self.config.sleep_time if self.config is not None else 0.5
+
         self._move_first_page()
-        time.sleep(_sleep_time)
+        self._sleep()
 
         # re-resize by source
         _canvas = self.browser.find_by_css('canvas').first._element
-        _width = _canvas.get_attribute('width')
-        self.browser.driver.set_window_size(_width, self.config.window_size['height'])
-        print(f'{_width}x{self.config.window_size["height"]}')
+        _width = int(_canvas.get_attribute('width'))
+        _height = 1200 if _width < 1000 and self.config.window_size['height'] > 1200 else self.config.window_size['height']
+        self.browser.driver.set_window_size(_width, _height)
+        print(f'{_width}x{_height}')
 
         while self._get_current_page() != 1:
             time.sleep(0.1)
 
-        _current = 1
-        _count = 0
-        self.pbar = tqdm(total=_total, bar_format='{n_fmt}/{total_fmt}')
+        for _count in range(0, _total):
 
-        while True:
             self.retry_count = 0
-            _image = self._capture(_count in _excludes)
-            _name = '%s%s%03d%s' % (self.directory, self.prefix, _count, _extension)
-            _image.save(_name, _format.upper())
+            self._save_image(_count, self._capture(_count in _excludes))
             self.pbar.update(1)
 
-            if _current < _total:
-                self._next()
-                while self._get_current_page() != _current + 1:
-                    time.sleep(0.1)
-                time.sleep(_sleep_time)
-            else:
-                break
+            self._next()
+            self._sleep()
 
-            _current = self._get_current_page()
-            _count = _count + 1
-
-        print('', flush=True)
         return True
 
     def _get_blank_check_exclude_pages(self, _total):
@@ -216,21 +141,10 @@ class Manager(object):
         現在のページを取得する
         @return 現在表示されているページ
         """
-        return int(self.current_page_element.html[:-2])
-
-    @staticmethod
-    def _check_directory(directory):
-        """
-        ディレクトリの存在を確認して，ない場合はそのディレクトリを作成する
-        @param directory 確認するディレクトリのパス
-        """
-        if not path.isdir(directory):
-            try:
-                makedirs(directory)
-            except OSError as exception:
-                print("ディレクトリの作成に失敗しました({0})".format(directory))
-                raise
-        return
+        try:
+            return int(self.current_page_element.html[:-2])
+        except:
+            return 0
 
     @retry(tries=10, delay=1)
     def _capture(self, ignore_blank):
@@ -239,7 +153,7 @@ class Manager(object):
         """
         _base64_image = self.browser.driver.get_screenshot_as_base64()
         _image = Image.open(io.BytesIO(base64.b64decode(_base64_image)))
-        if self.config is not None and (self.config.image_format == ImageFormat.JPEG):
+        if self._is_config_jpeg():
             _image = _image.convert('RGB')
 
         if self._is_blank_image(_image):
@@ -268,15 +182,17 @@ class Manager(object):
         次のページに進む
         スペースで次のページにすすめるのでスペースキー固定
         """
+        _current_page = self._get_current_page()
         self._press_key(self.next_key)
-        return
+        if self._get_current_page() and self._get_current_page() < self.pbar.total - 1:
+            while self._get_current_page() != _current_page + 1:
+                time.sleep(0.1)
 
     def _previous(self):
         """
         前のページに戻る
         """
         self._press_key(self.previous_key)
-        return
 
     def _move_first_page(self):
         """
@@ -284,38 +200,6 @@ class Manager(object):
         """
         while self._get_current_page() != 1:
             self._previous()
-        return
-
-    def _press_key(self, key):
-        """
-        指定したキーを押す
-        """
-        ActionChains(self.browser.driver).key_down(key).perform()
-        return
-
-    def _get_extension(self):
-        """
-        書き出すファイルの拡張子を取得する
-        @return 拡張子
-        """
-        if self.config is not None:
-            if self.config.image_format == ImageFormat.JPEG:
-                return '.jpg'
-            elif self.config.image_format == ImageFormat.PNG:
-                return '.png'
-        return '.jpg'
-
-    def _get_save_format(self):
-        """
-        書き出すファイルフォーマットを取得する
-        @return ファイルフォーマット
-        """
-        if self.config is not None:
-            if self.config.image_format == ImageFormat.JPEG:
-                return 'jpeg'
-            elif self.config.image_format == ImageFormat.PNG:
-                return 'png'
-        return 'jpeg'
 
     def _get_bound_on_side(self):
         _current = self._get_current_page()
@@ -341,4 +225,3 @@ class Manager(object):
         else:
             self.next_key = Keys.ARROW_LEFT
             self.previous_key = Keys.ARROW_RIGHT
-        return

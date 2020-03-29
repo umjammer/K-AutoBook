@@ -9,7 +9,7 @@ from datetime import datetime
 from runner import AbstractRunner
 from bookpass.login import YahooLogin
 from bookpass.manager import Manager
-from bookpass.config import Config as bookpassConfig
+from bookpass.config import Config as BookpassConfig
 
 
 class Runner(AbstractRunner):
@@ -47,7 +47,7 @@ class Runner(AbstractRunner):
         """
         bookpass の実行
         """
-        self.sub_config = bookpassConfig()
+        self.sub_config = BookpassConfig()
         if 'bookpass' in self.config.raw:
             self.sub_config.update(self.config.raw['bookpass'])
 

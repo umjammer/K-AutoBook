@@ -4,26 +4,15 @@ line-manga の操作を行うためのクラスモジュール
 """
 
 import base64
-import io
-import os
 import re
 import time
-from os import path
-from PIL import Image
-from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
-from tqdm import tqdm
-from linemanga.config import Config, ImageFormat
+from manager import AbstractManager
 
 
-class Manager(object):
+class Manager(AbstractManager):
     """
     line-manga の操作を行うためのクラス
-    """
-
-    MAX_LOADING_TIME = 5
-    """
-    初回読み込み時の最大待ち時間
     """
 
     def __init__(self, browser, config=None, directory='./', prefix=''):
@@ -31,131 +20,50 @@ class Manager(object):
         line-manga の操作を行うためのコンストラクタ
         @param browser splinter のブラウザインスタンス
         """
-        self.browser = browser
-        """
-        splinter のブラウザインスタンス
-        """
-        self.config = config if isinstance(config, Config) else None
-        """
-        line-manga の設定情報
-        """
-        self.directory = None
-        """
-        ファイルを出力するディレクトリ
-        """
-        self.prefix = None
-        """
-        出力するファイルのプレフィックス
-        """
-        self.next_key = None
+        super().__init__(browser, config, directory, prefix)
+
+        self.next_key = Keys.ARROW_LEFT
         """
         次のページに進むためのキー
-        """
-        self.previous_key = None
-        """
-        前のページに戻るためのキー
         """
         self.current_page_element = None
         """
         現在表示されているページのページ番号が表示されるエレメント
         """
 
-        self._set_directory(directory)
-        self._set_prefix(prefix)
-        return
-
-    def _set_directory(self, directory):
-        """
-        ファイルを出力するディレクトリを設定する
-        """
-        if directory == '':
-            self.directory = './'
-            print('Output to current directory')
-            return
-        _base_path = directory.rstrip('/')
-        if _base_path == '':
-            _base_path = '/'
-        elif not path.exists(_base_path):
-            self.directory = _base_path + '/'
-            return
-        else:
-            _base_path = _base_path + '-'
-        i = 1
-        while path.exists(_base_path + str(i)):
-            i = i + 1
-        self.directory = _base_path + str(i) + '/'
-        print("Change output directory to '%s' because '%s' alreadly exists"
-              % (self.directory, directory))
-        return
-
-    def _set_prefix(self, prefix):
-        """
-        出力ファイルのプレフィックス
-        """
-        self.prefix = prefix
-        return
-
-    @staticmethod
-    def _check_is_loading(list_ele):
-        is_loading = False
-        for i in list_ele:
-            if i.is_displayed() is True:
-                is_loading = True
-                break
-        return is_loading
-
-    def start(self):
+    def start(self, url=None):
         """
         ページの自動スクリーンショットを開始する
         @return エラーが合った場合にエラーメッセージを、成功時に True を返す
         """
-        time.sleep(2)
+        self._wait()
+
         _total = self._get_total_page()
         if _total is None:
             return '全ページ数の取得に失敗しました'
-        # print(f'total: {_total}')
+        self._set_total(_total)
+
         self.current_page_element = self._get_current_page_element()
         if self.current_page_element is None:
             return '現在のページ情報の取得に失敗しました'
 
-        self._check_directory(self.directory)
-        _extension = self._get_extension()
-        _format = self._get_save_format()
-        _sleep_time = self.config.sleep_time if self.config is not None else 0.5
-        time.sleep(_sleep_time)
-        _current = self._get_current_page()
-        _count = 0
-        _current = 1
+        # get original size
+        _canvas = self.browser.driver.find_element_by_css_selector("canvas.dummy")
+        self.browser.driver.set_window_size(int(_canvas.get_attribute('width')),
+                                            int(_canvas.get_attribute('height')))
+        print(f'size: {_canvas.get_attribute("width")}x{_canvas.get_attribute("height")}')
 
-        # get original size?
-        _dummy_canvas = self.browser.driver.find_element_by_css_selector(
-            "canvas.dummy")
-        self.browser.driver.set_window_size(int(_dummy_canvas.get_attribute('width')),
-                                            int(_dummy_canvas.get_attribute('height')))
-        print(f'size: {_dummy_canvas.get_attribute("width")}x{_dummy_canvas.get_attribute("height")}')
+        self._sleep()
 
-        self.pbar = tqdm(total=_total, bar_format='{n_fmt}/{total_fmt}')
-
-        while True:
+        for _count in range(0, _total):
 
             _base64_image = self.browser.driver.get_screenshot_as_base64()
-            _image = Image.open(io.BytesIO(base64.b64decode(_base64_image)))
-            if self.config is not None and (self.config.image_format == ImageFormat.JPEG):
-                _image = _image.convert('RGB')
-
-            _name = '%s%s%03d%s' % (self.directory, self.prefix, _count, _extension)
-            _image.save(_name, self._get_save_format().upper())
+            self._save_image_of_bytes(_count, base64.b64decode(_base64_image))
             self.pbar.update(1)
 
-            if _current == _total:
-                break
-
             self._next()
-            time.sleep(_sleep_time)
-            _current = self._get_current_page()
-            _count = _count + 1
+            self._sleep()
 
-        print('', flush=True)
         return True
 
     def _get_total_page(self):
@@ -191,50 +99,12 @@ class Manager(object):
         # print(int(self.current_page_element.html))
         return int(self.current_page_element.html)
 
-    @staticmethod
-    def _check_directory(directory):
-        """
-        ディレクトリの存在を確認して，ない場合はそのディレクトリを作成する
-        @param directory 確認するディレクトリのパス
-        """
-        if not path.isdir(directory):
-            try:
-                os.makedirs(directory)
-            except OSError as exception:
-                print("ディレクトリの作成に失敗しました({0})".format(directory))
-                raise
-        return
-
     def _next(self):
         """
         次のページに進む
         """
         _current_page = self._get_current_page()
-        _next_page = self.browser.driver.find_element_by_css_selector("div.fnViewerContainer")
-        ActionChains(self.browser.driver).move_to_element(_next_page).send_keys(Keys.ARROW_LEFT).perform()
-        while self._get_current_page() != _current_page + 1:
-            time.sleep(0.1)
-
-    def _get_extension(self):
-        """
-        書き出すファイルの拡張子を取得する
-        @return 拡張子
-        """
-        if self.config is not None:
-            if self.config.image_format == ImageFormat.JPEG:
-                return '.jpg'
-            elif self.config.image_format == ImageFormat.PNG:
-                return '.png'
-        return '.jpg'
-
-    def _get_save_format(self):
-        """
-        書き出すファイルフォーマットを取得する
-        @return ファイルフォーマット
-        """
-        if self.config is not None:
-            if self.config.image_format == ImageFormat.JPEG:
-                return 'jpeg'
-            elif self.config.image_format == ImageFormat.PNG:
-                return 'png'
-        return 'jpeg'
+        self._press_key(self.next_key)
+        if self._get_current_page() < self.pbar.total - 1:
+            while self._get_current_page() != _current_page + 1:
+                time.sleep(0.1)

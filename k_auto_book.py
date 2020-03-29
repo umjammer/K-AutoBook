@@ -59,6 +59,11 @@ def _reset_browser(browser, config):
 
 
 def _main():
+    """
+    $ python k_auto_book.py url [option]
+    or
+    $ python k_auto_book.py '?python script'
+    """
 
     _config = Config(_load_config_data())
     _make_directory(_config.log_directory)
@@ -94,7 +99,7 @@ def _main():
             
                 Input URL > ?[f'https://web-ace.jp/youngaceup/contents/1000053/episode/{n}/' for n in range(1124, 1152)]
             
-            this creates urls of range 1124 ~ 1152. and downloads the contents of the url  automatically.
+            this creates urls of range 1124 ~ 1152. and downloads the contents of the url automatically.
             """
             _urls = eval(_input_data[1:])
             _options = None
@@ -116,6 +121,7 @@ def _main():
                     _runner.run()
                     if _runner.need_reset():
                         _browser = _reset_browser(_browser, _config)
+                    print('', flush=True)
                     _done = True
             if not _done:
                 print('入力されたURLはサポートしていません')

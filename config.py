@@ -3,6 +3,9 @@
 設定クラスモジュール
 """
 
+from abc import ABC
+from enum import IntEnum
+
 
 class Config(object):
     """
@@ -67,3 +70,69 @@ class Config(object):
         if 'log_directory' in data:
             self.log_directory = data['log_directory']
         return
+
+
+class ImageFormat(IntEnum):
+    """
+    書き出す画像のフォーマット
+    """
+
+    JPEG = 1
+    """
+    JPEG フォーマット
+    """
+    PNG = 2
+    """
+    PNG フォーマット
+    """
+
+
+class AbstractConfig(ABC):
+
+    def __init__(self):
+        """
+        設定情報を管理するためのコンストラクタ
+        @param data 設定情報
+        """
+        self.needs_login = False
+        """
+        ログインする必要があるかどうか
+        """
+        self.image_format = ImageFormat.JPEG
+        """
+        書き出す画像フォーマット
+        """
+        self.sleep_time = 0.5
+        """
+        ページスクロールのスリープ時間
+        """
+
+    def update(self, data):
+        """
+        設定情報を更新する
+        @param data 更新するデータ
+        """
+        if 'needs_login' in data:
+            self.needs_login = data['needs_login']
+        if 'image_format' in data:
+            self._set_image_format(data['image_format'])
+        if 'sleep_time' in data:
+            self.sleep_time = data['sleep_time']
+
+    def _set_image_format(self, format_):
+        """
+        書き出す画像のフォーマットを設定する
+        使用できるフォーマットは bookstore.ImageFormat.ImageFormat に記されている
+        @param format_ 画像のフォーマット
+        """
+        if isinstance(format_, str):
+            _format = format_.upper()
+            if _format in {ImageFormat.JPEG.name, str(int(ImageFormat.JPEG))}:
+                self.image_format = ImageFormat.JPEG
+            elif _format in {ImageFormat.PNG.name, str(int(ImageFormat.PNG))}:
+                self.image_format = ImageFormat.PNG
+        elif isinstance(format_, int):
+            if format_ == ImageFormat.JPEG:
+                self.image_format = ImageFormat.JPEG
+            elif format_ == ImageFormat.PNG:
+                self.image_format = ImageFormat.PNG
