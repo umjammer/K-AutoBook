@@ -4,7 +4,6 @@
 """
 
 import re
-from urllib import request
 from manager import AbstractManager
 
 
@@ -13,24 +12,24 @@ class Manager(AbstractManager):
     アルファポリスから漫画をダウンロードするクラス
     """
 
-    def __init__(self, directory='./', prefix=''):
+    def __init__(self, browser, config=None, directory='./', prefix=''):
         """
         アルファポリスの操作を行うためのコンストラクタ
         @param directory 出力するファイル群を置くディレクトリ
         @param prefix 出力するファイル名のプレフィックス
         """
-        super().__init__(directory=directory, prefix=prefix)
+        super().__init__(browser, config, directory, prefix)
 
     def start(self, url=None):
         """
         ページの自動自動ダウンロードを開始する
         @param url アルフォポリスのコンテンツの URL
         """
-        _sources = self._get_image_urls(url)
+        session = self._get_session()
+
+        _sources = self._get_image_urls(session, url)
         _total = len(_sources)
         self._set_total(_total)
-
-        session = self._get_session()
 
         for _index in range(_total):
             self._save_image_of_bytes(_index, session.get(_sources[_index]).content)
@@ -39,24 +38,17 @@ class Manager(AbstractManager):
         return True
 
     @staticmethod
-    def _get_image_urls(url):
+    def _get_image_urls(session, url):
         """
         漫画画像の URL を取得する
         @param url アルファボリスで漫画を表示しているページの URL
         @return ページの URL のリスト
         """
-        _response = request.urlopen(url)
-        if _response.getcode() != 200:
-            print("漫画データの取得に失敗しました")
-            return []
-        _html = str(_response.read())
-        _matches = re.findall(r"var\s+_base\s*=\s*\"([^\"]+)\";", _html)
+        _response = session.get(url)
+        if _response.status_code != 200:
+            raise Exception("漫画データの取得に失敗しました")
+        _html = _response.text
+        _matches = re.findall('_pages.push\\("(https://.+\\.jpg)"\\);', _html)
         if len(_matches) == 0:
-            print("漫画情報のURLの取得に失敗しました")
-            return []
-        _base = _matches[0]
-        _matches = re.findall(r"_pages.push\(\"(\d+\.jpg)\"\);", _html)
-        if len(_matches) == 0:
-            print("漫画のページ情報の取得に失敗しました")
-            return []
-        return [_base + _page for _page in _matches]
+            raise Exception("漫画のページ情報の取得に失敗しました")
+        return [_page for _page in _matches]

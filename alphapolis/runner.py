@@ -21,7 +21,7 @@ class Runner(AbstractRunner):
     patterns = [
         'manga\\/official\\/(\\d+)',
         'manga\\/viewManga\\/(\\?.*no=)?(\\d+)',
-        'manga\\/official\\/(\\d+)/(\\d+)'
+        'manga\\/official\\/(\\d+)\\/(\\d+)'
     ]
     """
     サポートするアルファポリスのパスの正規表現のパターンのリスト
@@ -33,5 +33,5 @@ class Runner(AbstractRunner):
         """
         # _destination = input('Output Path > ')
         _destination = self.get_id()
-        _manager = Manager(_destination)
+        _manager = Manager(self.browser, None, _destination)
         _manager.start(self.url)
