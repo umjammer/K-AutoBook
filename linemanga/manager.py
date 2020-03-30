@@ -41,7 +41,6 @@ class Manager(AbstractManager):
         _total = self._get_total_page()
         if _total is None:
             return '全ページ数の取得に失敗しました'
-        self._set_total(_total)
 
         self.current_page_element = self._get_current_page_element()
         if self.current_page_element is None:
@@ -55,9 +54,9 @@ class Manager(AbstractManager):
 
         self._sleep()
 
+        self._set_total(_total)
         for _count in range(0, _total):
 
-            # _base64_image = _canvas.screenshot_as_base64  # TODO try this
             _base64_image = self.browser.driver.get_screenshot_as_base64()
             self._save_image_of_bytes(_count, base64.b64decode(_base64_image))
             self.pbar.update(1)

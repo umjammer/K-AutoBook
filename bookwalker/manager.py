@@ -41,7 +41,6 @@ class Manager(AbstractManager):
         _total = self._get_total_page()
         if _total is None:
             return '全ページ数の取得に失敗しました'
-        self._set_total(_total)
 
         # get original size
         _canvas = self.browser.driver.find_element_by_css_selector("canvas.dummy")
@@ -51,6 +50,7 @@ class Manager(AbstractManager):
 
         self._sleep()
 
+        self._set_total(_total)
         for _count in range(0, _total):
 
             _canvas = self.browser.driver.find_element_by_css_selector(".currentScreen canvas")
