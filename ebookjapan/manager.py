@@ -90,7 +90,7 @@ class Manager(AbstractManager):
         # re-resize by source
         _canvas = self.browser.find_by_css('canvas').first._element
         _width = int(_canvas.get_attribute('width'))
-        _height = 1200 if _width < 1000 and self.config.window_size['height'] > 1200 else self.config.window_size['height']
+        _height = 1200 if _width < 1000 and self.config.window_size['height'] > 1500 else self.config.window_size['height']
         self.browser.driver.set_window_size(_width, _height)
         print(f'{_width}x{_height}')
 
