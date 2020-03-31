@@ -8,18 +8,18 @@ This program downloads web comics.
 
 Types available.
 
-|site|method|size|comment|sample url|
-|----|------|----|-------|----------|
-|[alphaplis](http://www.alphapolis.co.jp/)|direct file|auto| |[⚓](http://www.alphapolis.co.jp/manga/viewManga/46) [⚓](http://www.alphapolis.co.jp/manga/viewOpening/138000030/)|
-|[ebookjapan](http://ebookjapan.yahoo.co.jp/)|screen capture|manual|need to specify size for every volume|[⚓](https://ebookjapan.yahoo.co.jp/books/145222/A000100547)|
-|[bookpass]()|canvas data|auto| |[⚓](https://bookpass.auone.jp/pack/detail/?iid=BT000069318400100101&cs=top_freecomics_reco_670&pos=2&tab=1&ajb=3)|
-|[bookwalker]()|canvas data|auto| |[⚓](https://viewer.bookwalker.jp/browserWebApi/03/view?cid=57c84cf2-7062-4ef9-9071-45fb249c926e)|
-|[comicdays]()|direct file (re-rendered)|auto| |[⚓](https://comic-days.com/volume/13932016480030155016)|
-|[comicwalker]()|direct file (decrypted)|auto| |[⚓](https://comic-walker.com/viewer/?tw=2&dlcl=ja&cid=KDCW_MF09000001010005_68)|
-|[ganganonline]()|direct file (blob)|auto| |[⚓](https://viewer.ganganonline.com/manga/?chapterId=15502)|
-|[linemanga]()|screen capture|auto| |[⚓](https://manga.line.me/book/viewer?id=92dc0b4e-c5d4-4518-9fba-d78fb1e6b0f0)|
-|[webace]()|direct file|auto| |[⚓](https://web-ace.jp/youngaceup/contents/1000053/episode/1092/)|
-|[zebrackcomic]()|direct file (blob)|auto| |[⚓](https://zebrack-comic.com/title/37/volume/1498/viewer)|
+|site|method|image|size|comment|sample url|
+|----|------|-----|----|-------|----------|
+|[alphaplis](http://www.alphapolis.co.jp/)|meta|direct file|auto| |[⚓](http://www.alphapolis.co.jp/manga/viewManga/46) [⚓](http://www.alphapolis.co.jp/manga/viewOpening/138000030/)|
+|[ebookjapan](http://ebookjapan.yahoo.co.jp/)|paging|screen capture|manual|need to specify size for every volume|[⚓](https://ebookjapan.yahoo.co.jp/books/145222/A000100547)|
+|[bookpass]()|paging|canvas data|auto| |[⚓](https://bookpass.auone.jp/pack/detail/?iid=BT000069318400100101&cs=top_freecomics_reco_670&pos=2&tab=1&ajb=3)|
+|[bookwalker]()|paging|canvas data|auto| |[⚓](https://viewer.bookwalker.jp/browserWebApi/03/view?cid=57c84cf2-7062-4ef9-9071-45fb249c926e)|
+|[comicdays]()|meta|direct file (re-rendered)|auto| |[⚓](https://comic-days.com/volume/13932016480030155016)|
+|[comicwalker]()|meta|direct file (decrypted)|auto| |[⚓](https://comic-walker.com/viewer/?tw=2&dlcl=ja&cid=KDCW_MF09000001010005_68)|
+|[ganganonline]()|paging|direct file (blob)|auto| |[⚓](https://viewer.ganganonline.com/manga/?chapterId=15502)|
+|[linemanga]()|paging|screen capture|auto| |[⚓](https://manga.line.me/book/viewer?id=92dc0b4e-c5d4-4518-9fba-d78fb1e6b0f0)|
+|[webace]()|meta|direct file|auto| |[⚓](https://web-ace.jp/youngaceup/contents/1000053/episode/1092/)|
+|[zebrackcomic]()|paging|direct file (blob)|auto| |[⚓](https://zebrack-comic.com/title/37/volume/1498/viewer)|
 
 ## Requirement
 
