@@ -45,8 +45,9 @@ class Manager(AbstractManager):
         self._sleep()
 
         _touch = self.browser.find_by_css("div.Viewer-fit-fill").first
-
         _touch.click()  # show slider
+        self._sleep()
+
         _total = self._get_total_page()
         if not _total:
             return '全ページ数の取得に失敗しました'
@@ -54,15 +55,13 @@ class Manager(AbstractManager):
         self.current_page_element = self._get_current_page_element()
         if self.current_page_element is None:
             return '現在のページ情報の取得に失敗しました'
-        self._sleep()
 
         _touch = self.browser.find_by_css("body").first
         _touch.click()  # hide slider
         self._sleep()
 
-        _count = 0
         self._set_total(_total)
-        while _count < _total:
+        for _count in range(0, _total):
 
             _canvas = self.browser.find_by_css("div.page > canvas").first._element
             self._save_image_of_web_element(_count, _canvas)
@@ -71,8 +70,6 @@ class Manager(AbstractManager):
 
             self._next()
             self._sleep()
-
-            _count = _count + 1
 
         return True
 
@@ -125,7 +122,6 @@ class Manager(AbstractManager):
     def _next(self):
         """
         次のページに進む
-        スペースで次のページにすすめるのでスペースキー固定
         """
         _current_page = self._get_current_page()
         self._press_key(self.next_key)
