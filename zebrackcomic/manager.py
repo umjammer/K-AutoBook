@@ -59,15 +59,15 @@ class Manager(AbstractManager):
         最初にフッタの出し入れをする
         @return 取得成功時に全ページ数を、失敗時に None を返す
         """
-        try:
-            _element = self.browser.driver.find_element_by_xpath("//*[@id='root']/*/div/div[3]/p")
-            for _ in range(Manager.MAX_LOADING_TIME):
+        for _ in range(Manager.MAX_LOADING_TIME):
+            try:
+                _element = self.browser.driver.find_element_by_xpath("//*[@id='root']/*/div/div[3]/p")
                 # print(_element.get_attribute('innerHTML'))
                 if re.match('^\\d+ / \\d+$', _element.get_attribute('innerHTML')):
                     return int(_element.get_attribute('innerHTML').split('/')[1].strip())
+            except:
                 time.sleep(1)
-        except:
-            return None
+        return None
 
     def _get_current_page_element(self):
         """
