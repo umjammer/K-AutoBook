@@ -10,7 +10,7 @@ Types available.
 
 |site|method|image|size|comment|sample url|
 |----|------|-----|----|-------|----------|
-|[alphaplis](http://www.alphapolis.co.jp/)|meta|direct file|auto| |[⚓](http://www.alphapolis.co.jp/manga/viewManga/46) [⚓](http://www.alphapolis.co.jp/manga/viewOpening/138000030/)|
+|[alphapolis](http://www.alphapolis.co.jp/)|meta|direct file|auto| |[⚓](http://www.alphapolis.co.jp/manga/viewManga/46) [⚓](http://www.alphapolis.co.jp/manga/viewOpening/138000030/)|
 |[ebookjapan](http://ebookjapan.yahoo.co.jp/)|paging|screen capture|manual|need to specify size for every volume|[⚓](https://ebookjapan.yahoo.co.jp/books/145222/A000100547)|
 |[bookpass]()|paging|canvas data|auto| |[⚓](https://bookpass.auone.jp/pack/detail/?iid=BT000069318400100101&cs=top_freecomics_reco_670&pos=2&tab=1&ajb=3)|
 |[bookwalker]()|paging|canvas data|auto| |[⚓](https://viewer.bookwalker.jp/browserWebApi/03/view?cid=57c84cf2-7062-4ef9-9071-45fb249c926e)|
