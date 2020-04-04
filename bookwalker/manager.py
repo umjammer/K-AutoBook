@@ -42,6 +42,8 @@ class Manager(AbstractManager):
         if _total is None:
             return '全ページ数の取得に失敗しました'
 
+        self._sleep()
+
         # get original size
         _canvas = self.browser.driver.find_element_by_css_selector("canvas.dummy")
         self.browser.driver.set_window_size(int(_canvas.get_attribute('width')),
@@ -68,13 +70,12 @@ class Manager(AbstractManager):
         最初にフッタの出し入れをする
         @return 取得成功時に全ページ数を、失敗時に None を返す
         """
-        _elements = self.browser.find_by_id('pageSliderCounter')
-        if len(_elements) == 0:
-            return None
         for _ in range(Manager.MAX_LOADING_TIME):
-            # print(_elements.first.html)
-            if re.match('^\\d+/\\d+$', _elements.first.html.strip()):
-                return int(_elements.first.html.split('/')[1])
+            _elements = self.browser.find_by_id('pageSliderCounter')
+            if len(_elements) != 0:
+                # print(_elements.first.html)
+                if re.match('^\\d+/\\d+$', _elements.first.html.strip()):
+                    return int(_elements.first.html.split('/')[1])
             time.sleep(1)
         return None
 
