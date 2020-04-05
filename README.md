@@ -14,13 +14,13 @@ Types available.
 |[ebookjapan](http://ebookjapan.yahoo.co.jp/)|paging|screen capture|manual|need to specify size for every volume|[⚓](https://ebookjapan.yahoo.co.jp/books/145222/A000100547)|
 |[bookpass]()|paging|canvas data|auto| |[⚓](https://bookpass.auone.jp/pack/detail/?iid=BT000069318400100101&cs=top_freecomics_reco_670&pos=2&tab=1&ajb=3)|
 |[bookwalker]()|paging|canvas data|auto| |[⚓](https://viewer.bookwalker.jp/browserWebApi/03/view?cid=57c84cf2-7062-4ef9-9071-45fb249c926e)|
-|[comicdays]()|meta|direct file (re-rendered)|auto| |[⚓](https://comic-days.com/volume/13932016480030155016)|
-|[comicwalker]()|meta|direct file (decrypted)|auto| |[⚓](https://comic-walker.com/viewer/?tw=2&dlcl=ja&cid=KDCW_MF09000001010005_68)|
+|[comicdays](https://comic-days.com/)|meta|direct file (re-rendered)|auto| |[⚓](https://comic-days.com/volume/13932016480030155016)|
+|[comicwalker](https://comic-walker.com/)|meta|direct file (decrypted)|auto| |[⚓](https://comic-walker.com/viewer/?tw=2&dlcl=ja&cid=KDCW_MF09000001010005_68)|
 |[ganganonline]()|paging|direct file (blob)|auto| |[⚓](https://viewer.ganganonline.com/manga/?chapterId=15502)|
-|[linemanga]()|paging|screen capture|auto| |[⚓](https://manga.line.me/book/viewer?id=92dc0b4e-c5d4-4518-9fba-d78fb1e6b0f0)|
-|[webace]()|meta|direct file|auto| |[⚓](https://web-ace.jp/youngaceup/contents/1000053/episode/1092/)|
-|[zebrackcomic]()|paging|direct file (blob)|auto| |[⚓](https://zebrack-comic.com/title/37/volume/1498/viewer)|
-
+|[linemanga](https://manga.line.me/)|paging|screen capture|auto|need to update cookie|[⚓](https://manga.line.me/book/viewer?id=92dc0b4e-c5d4-4518-9fba-d78fb1e6b0f0)|
+|[webace](https://web-ace.jp/)|meta|direct file|auto| |[⚓](https://web-ace.jp/youngaceup/contents/1000053/episode/1092/)|
+|[zebrackcomic](https://zebrack-comic.com/)|paging|direct file (blob)|auto| |[⚓](https://zebrack-comic.com/title/37/volume/1498/viewer)|
+|[booklive](https://booklive.jp/)|paging|direct file (blob, re-rendered)|auto| |[⚓]('https://booklive.jp/bviewer/s/?cid=208562_003&rurl=https%3A%2F%2Fbooklive.jp%2Findex%2Fno-charge%2Fcategory_id%2FC)|
 ## Requirement
 
 * `Python` Python 3 (tested on 3.7.6)
