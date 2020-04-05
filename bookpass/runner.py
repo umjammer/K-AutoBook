@@ -18,16 +18,6 @@ class Runner(AbstractRunner):
     https://bookpass.auone.jp/pack/detail/?iid=BT000069318400100101&cs=top_freecomics_reco_670&pos=2&tab=1&ajb=3
     """
 
-    OPTION_BOUND_ON_LEFT_SIDE = 'L'
-    """
-    左綴じを示すオプション
-    """
-
-    OPTION_BOUND_ON_RIGHT_SIDE = 'R'
-    """
-    右綴じを示すオプション
-    """
-
     domain_pattern = 'bookpass\\.auone\\.jp'
     """
     サポートするドメイン

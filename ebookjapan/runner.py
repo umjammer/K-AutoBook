@@ -20,16 +20,6 @@ class Runner(AbstractRunner):
     https://ebookjapan.yahoo.co.jp/books/145222/A000100547
     """
 
-    OPTION_BOUND_ON_LEFT_SIDE = 'L'
-    """
-    左綴じを示すオプション
-    """
-
-    OPTION_BOUND_ON_RIGHT_SIDE = 'R'
-    """
-    右綴じを示すオプション
-    """
-
     domain_pattern = 'ebookjapan\\.yahoo\\.co\\.jp'
     """
     サポートするドメイン

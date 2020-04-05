@@ -1,6 +1,6 @@
 # --- coding: utf-8 ---
 """
-ganganonline ブックストアの設定モジュール
+bookpass ブックストアの設定モジュール
 """
 
 from config import AbstractConfig

@@ -20,16 +20,6 @@ class Runner(AbstractRunner):
     詳細ページ https://bookwalker.jp/{cid}/ の赤いボタン "今すぐ読む (無料)" のリンクをコピー
     """
 
-    OPTION_BOUND_ON_LEFT_SIDE = 'L'
-    """
-    左綴じを示すオプション
-    """
-
-    OPTION_BOUND_ON_RIGHT_SIDE = 'R'
-    """
-    右綴じを示すオプション
-    """
-
     domain_pattern = 'viewer\\.bookwalker\\.jp'
     """
     サポートするドメイン

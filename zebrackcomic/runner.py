@@ -20,16 +20,6 @@ class Runner(AbstractRunner):
     https://zebrack-comic.com/title/37/volume/1498/viewer
     """
 
-    OPTION_BOUND_ON_LEFT_SIDE = 'L'
-    """
-    左綴じを示すオプション
-    """
-
-    OPTION_BOUND_ON_RIGHT_SIDE = 'R'
-    """
-    右綴じを示すオプション
-    """
-
     domain_pattern = 'zebrack-comic\\.com'
     """
     サポートするドメイン

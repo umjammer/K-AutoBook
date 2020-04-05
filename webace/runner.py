@@ -18,16 +18,6 @@ class Runner(AbstractRunner):
     https://web-ace.jp/youngaceup/contents/1000053/episode/1092/
     """
 
-    OPTION_BOUND_ON_LEFT_SIDE = 'L'
-    """
-    左綴じを示すオプション
-    """
-
-    OPTION_BOUND_ON_RIGHT_SIDE = 'R'
-    """
-    右綴じを示すオプション
-    """
-
     domain_pattern = 'web-ace\\.jp'
     """
     サポートするドメイン

@@ -18,16 +18,6 @@ class Runner(AbstractRunner):
     https://viewer.ganganonline.com/manga/?chapterId=15502
     """
 
-    OPTION_BOUND_ON_LEFT_SIDE = 'L'
-    """
-    左綴じを示すオプション
-    """
-
-    OPTION_BOUND_ON_RIGHT_SIDE = 'R'
-    """
-    右綴じを示すオプション
-    """
-
     domain_pattern = 'viewer\\.ganganonline\\.com'
     """
     サポートするドメイン
