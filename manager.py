@@ -5,6 +5,7 @@
 
 import base64
 import io
+import math
 import time
 from abc import ABC, abstractmethod
 from os import path, listdir, makedirs
@@ -100,6 +101,12 @@ class AbstractManager(ABC):
     def _set_total(self, total):
         self.pbar = tqdm(total=total, bar_format='{n_fmt}/{total_fmt}')
         # print(f'total: {_total}')
+
+    def _get_image_by_url(self, url):
+        _image = Image.open(io.BytesIO(get_file_content_chrome(self.browser.driver, url)))
+        if self._is_config_jpeg():
+            _image = _image.convert('RGB')
+        return _image
 
     def _save_image_of_web_element(self, count, element):
         _base64_image = self.browser.driver.execute_script(
@@ -220,3 +227,23 @@ def get_session(ua):
     session.mount('https://', HTTPAdapter(max_retries=3))
     session.headers.update({'User-Agent': f'{ua}'})
     return session
+
+
+def decrypt_coreview_image(src, MULTIPLE=8, DIVIDE_NUM=4):
+    """
+    coreview decryption
+    """
+    w, h = src.size
+    cw = math.floor(w / (DIVIDE_NUM * MULTIPLE)) * MULTIPLE
+    ch = math.floor(h / (DIVIDE_NUM * MULTIPLE)) * MULTIPLE
+    dest = Image.new('RGB', (w, h))
+    dest.paste(src)
+    for e in range(0, DIVIDE_NUM * DIVIDE_NUM):
+        t = math.floor(e / DIVIDE_NUM) * ch
+        n = e % DIVIDE_NUM * cw
+        r = math.floor(e / DIVIDE_NUM)
+        i = e % DIVIDE_NUM * DIVIDE_NUM + r
+        o = i % DIVIDE_NUM * cw
+        s = math.floor(i / DIVIDE_NUM) * ch
+        dest.paste(src.crop((n, t, n + cw, t + ch)), (o, s, o + cw, s + ch))
+    return dest

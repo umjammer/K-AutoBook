@@ -6,10 +6,9 @@ http://redsquirrel87.altervista.org/doku.php/manga-downloader and cfr :P
 """
 
 import json
-import math
 from io import BytesIO
 from PIL import Image
-from manager import AbstractManager
+from manager import AbstractManager, decrypt_coreview_image
 
 
 class Manager(AbstractManager):
@@ -45,28 +44,8 @@ class Manager(AbstractManager):
 
         return True
 
-    @staticmethod
-    def decrypt_image(src, MULTIPLE=8, DIVIDE_NUM=4):
-        """
-        coreview decryption
-        """
-        w, h = src.size
-        cw = math.floor(w / (DIVIDE_NUM * MULTIPLE)) * MULTIPLE
-        ch = math.floor(h / (DIVIDE_NUM * MULTIPLE)) * MULTIPLE
-        dest = Image.new('RGB', (w, h))
-        dest.paste(src)
-        for e in range(0, DIVIDE_NUM * DIVIDE_NUM):
-            t = math.floor(e / DIVIDE_NUM) * ch
-            n = e % DIVIDE_NUM * cw
-            r = math.floor(e / DIVIDE_NUM)
-            i = e % DIVIDE_NUM * DIVIDE_NUM + r
-            o = i % DIVIDE_NUM * cw
-            s = math.floor(i / DIVIDE_NUM) * ch
-            dest.paste(src.crop((n, t, n + cw, t + ch)), (o, s, o + cw, s + ch))
-        return dest
-
     def fetch_page(self, session, url, count):
-        _image = self.decrypt_image(Image.open(BytesIO(session.get(url).content)))
+        _image = decrypt_coreview_image(Image.open(BytesIO(session.get(url).content)))
         if self._is_config_jpeg():
             _image = _image.convert('RGB')
         self._save_image(count, _image)

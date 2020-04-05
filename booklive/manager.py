@@ -3,11 +3,10 @@
 booklive の操作を行うためのクラスモジュール
 """
 
-import io
 import re
 import time
 from selenium.webdriver.common.keys import Keys
-from manager import AbstractManager, get_file_content_chrome
+from manager import AbstractManager
 from PIL import Image
 
 
@@ -53,7 +52,7 @@ class Manager(AbstractManager):
         for _count in range(0, _total):
 
             _imgs = self.browser.find_by_css(f"#content-p{_count + 1} div.pt-img img")
-            _images = [self._get_image(_img._element.get_attribute('src')) for _img in _imgs]
+            _images = [self._get_image_by_url(_img._element.get_attribute('src')) for _img in _imgs]
             # print(f'images: {len(_images)}')
             _w = _images[0].size[0]
             _h = sum(_image.size[1] for _image in _images)
@@ -70,12 +69,6 @@ class Manager(AbstractManager):
             self._sleep()
 
         return True
-
-    def _get_image(self, url):
-        _image = Image.open(io.BytesIO(get_file_content_chrome(self.browser.driver, url)))
-        if self._is_config_jpeg():
-            _image = _image.convert('RGB')
-        return _image
 
     def _get_total_page(self):
         """
