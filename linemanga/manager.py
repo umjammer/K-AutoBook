@@ -72,14 +72,14 @@ class Manager(AbstractManager):
         最初にフッタの出し入れをする
         @return 取得成功時に全ページ数を、失敗時に None を返す
         """
-        _elements = self.browser.find_by_css("span.fnViewerSliderNumTotal")
-        if len(_elements) == 0:
-            return None
         for _ in range(Manager.MAX_LOADING_TIME):
-            # print(f'"{_elements.first.html}"')
-            if re.match(r'^\d+$', _elements.first.html.strip()):
-                return int(_elements.first.html.strip())
+            _elements = self.browser.find_by_css("span.fnViewerSliderNumTotal")
+            if len(_elements) != 0:
+                # print(f'"{_elements.first.html}"')
+                if re.match(r'^\d+$', _elements.first.html.strip()):
+                    return int(_elements.first.html.strip())
             time.sleep(1)
+        return None
 
     def _get_current_page_element(self):
         """

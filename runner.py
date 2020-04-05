@@ -148,3 +148,18 @@ class AbstractRunner(ABC):
                             class_list.append(attr)
         # print(f'{class_list}')
         return class_list
+
+    @staticmethod
+    def _get_cookie_dict(cookies):
+        cookies = cookies.split('; ')
+        cookies_dict = {}
+        for i in cookies:
+            kv = i.split('=')
+            cookies_dict[kv[0]] = kv[1]
+        return cookies_dict
+
+    @staticmethod
+    def _add_cookies(driver, cookies):
+        for i in cookies:
+            # print(f"{i}: {cookies[i]}")
+            driver.add_cookie({'name': i, 'value': cookies[i]})

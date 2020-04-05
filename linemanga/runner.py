@@ -18,16 +18,6 @@ class Runner(AbstractRunner):
     https://manga.line.me/book/viewer?id=92dc0b4e-c5d4-4518-9fba-d78fb1e6b0f0
     """
 
-    OPTION_BOUND_ON_LEFT_SIDE = 'L'
-    """
-    左綴じを示すオプション
-    """
-
-    OPTION_BOUND_ON_RIGHT_SIDE = 'R'
-    """
-    右綴じを示すオプション
-    """
-
     domain_pattern = 'manga\\.line\\.me'
     """
     サポートするドメイン
@@ -71,7 +61,7 @@ class Runner(AbstractRunner):
             self.browser.driver.save_screenshot(
                 path.join(self.config.log_directory, _filename))
             raise err
-        print('Loading page of inputed url (%s)' % self.url)
+        print('Loading page of inputted url (%s)' % self.url)
         self.browser.visit(self.url)
 
         print('Open main page')
@@ -124,18 +114,3 @@ class Runner(AbstractRunner):
             Runner.is_login = True
             return True
         return False
-
-    @staticmethod
-    def _get_cookie_dict(cookies):
-        cookies = cookies.split('; ')
-        cookies_dict = {}
-        for i in cookies:
-            kv = i.split('=')
-            cookies_dict[kv[0]] = kv[1]
-        return cookies_dict
-
-    @staticmethod
-    def _add_cookies(driver, cookies):
-        for i in cookies:
-            # print(f"{i}: {cookies[i]}")
-            driver.add_cookie({'name': i, 'value': cookies[i]})
