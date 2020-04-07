@@ -17,11 +17,13 @@ Types available.
 |[comicdays](https://comic-days.com/)|meta|direct file (re-rendered)|auto| |[⚓](https://comic-days.com/volume/13932016480030155016)|
 |[comicwalker](https://comic-walker.com/)|meta|direct file (decrypted)|auto| |[⚓](https://comic-walker.com/viewer/?tw=2&dlcl=ja&cid=KDCW_MF09000001010005_68)|
 |[ganganonline](https://www.ganganonline.com/)|paging|direct file (blob)|auto| |[⚓](https://viewer.ganganonline.com/manga/?chapterId=15502)|
-|[linemanga](https://manga.line.me/)|paging|screen capture|auto|need to update cookie|[⚓](https://manga.line.me/book/viewer?id=92dc0b4e-c5d4-4518-9fba-d78fb1e6b0f0)|
+|[linemanga](https://manga.line.me/)|paging|screen capture|auto|needs to update cookie|[⚓](https://manga.line.me/book/viewer?id=92dc0b4e-c5d4-4518-9fba-d78fb1e6b0f0)|
 |[webace](https://web-ace.jp/)|meta|direct file|auto| |[⚓](https://web-ace.jp/youngaceup/contents/1000053/episode/1092/)|
 |[zebrackcomic](https://zebrack-comic.com/)|paging|direct file (blob)|auto| |[⚓](https://zebrack-comic.com/title/37/volume/1498/viewer)|
 |[booklive](https://booklive.jp/)|paging|direct file (blob, re-rendered)|auto| |[⚓]('https://booklive.jp/bviewer/s/?cid=208562_003&rurl=https%3A%2F%2Fbooklive.jp%2Findex%2Fno-charge%2Fcategory_id%2FC)|
-|[jumpplus](https://shonenjumpplus.com/)|meta|direct file (re-rendered)|auto|use comicdays manager|[⚓](https://shonenjumpplus.com/episode/13932016480031086197)|
+|[jumpplus](https://shonenjumpplus.com/)|meta|direct file (re-rendered)|auto|uses comicdays manager|[⚓](https://shonenjumpplus.com/episode/13932016480031086197)|
+|[magazinepocket](https://pocket.shonenmagazine.com/)|meta|direct file (re-rendered)|auto|uses comicdays manager|[⚓](https://pocket.shonenmagazine.com/episode/13933686331610373465)|
+
 ## Requirement
 
 * `Python` Python 3 (tested on 3.7.6)
