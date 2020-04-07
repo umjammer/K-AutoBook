@@ -23,6 +23,8 @@ class Manager(AbstractManager):
         """
         super().__init__(browser, config, directory, prefix)
 
+        self._image_type = None
+
     def start(self, url=None):
         """
         ページの自動スクリーンショットを開始する
@@ -32,6 +34,7 @@ class Manager(AbstractManager):
 
         _script = self.browser.find_by_id('episode-json').first._element
         _json = json.loads(_script.get_attribute('data-value'))
+        self._image_type = _json['readableProduct']['pageStructure']['choJuGiga']
         _pages = [x for x in _json['readableProduct']['pageStructure']['pages'] if x['type'] == 'main']
         self._set_total(len(_pages))
 
@@ -45,7 +48,10 @@ class Manager(AbstractManager):
         return True
 
     def fetch_page(self, session, url, count):
-        _image = decrypt_coreview_image(Image.open(BytesIO(session.get(url).content)))
+        if self._image_type == 'usagi':
+            _image = Image.open(BytesIO(session.get(url).content))
+        else:
+            _image = decrypt_coreview_image(Image.open(BytesIO(session.get(url).content)))
         if self._is_config_jpeg():
             _image = _image.convert('RGB')
         self._save_image(count, _image)
