@@ -2,6 +2,7 @@
 """
 実行するためのの抽象クラスモジュール
 """
+
 import inspect
 import os
 import re

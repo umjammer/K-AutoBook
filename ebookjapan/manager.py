@@ -16,24 +16,6 @@ from manager import AbstractManager
 class Manager(AbstractManager):
     """
     ebookjapanの操作を行うためのクラス
-
-    trimming has eliminated.
-    you should set screen size option in "config.json" or write command line option like
-    ```
-    Input URL > https://ebookjapan.yahoo.co.jp/books/119594/A000048753/ {"window_size":{"width":784,"height":1200}}
-    ```
-
-    how to know screen size
-    F12 -> Application -> Frames/Images/'blob:https://ebookjapan.yahoo.co.jp/...'
-     * click the address above
-     * left pane, encrypted image would be shown, status bar, image size would be shown
-     * we'd like to use this size, but we need some calculation for height (like 1248 -> 1200, 1672 -> 1600?, etc.)
-     * for width, we can find from the html source, css selector: "canvas", attribute: "width"
-    the calculation rule is unknown, i use practical values.
-    if we want to get original size, we need to decrypt images
-    i know how to decrypt images but i don't know how to get images...
-
-    i really not recommend to use this plugin, use original version of ebookjapan, it's safety.
     """
 
     def __init__(self, browser, config=None, directory='./', prefix=''):
@@ -67,8 +49,20 @@ class Manager(AbstractManager):
         self._wait()
 
         # resize by option
-        self.browser.driver.set_window_size(self.config.window_size['width'], self.config.window_size['height'])
-        print(f'config: {self.config.window_size["width"]}x{self.config.window_size["height"]}')
+        self._sleep(2)
+        self.browser.driver.set_window_size(1300, 1800)
+        self._sleep(2)
+        _canvas = self.browser.find_by_css('canvas').first._element
+        _height = int(_canvas.get_attribute('height'))
+        print(f'height: {_height}')
+        self.browser.driver.set_window_size(200, 320)
+        self._sleep(2)
+        _canvas = self.browser.find_by_css('canvas').first._element
+        _width = int(_canvas.get_attribute('width'))
+        print(f'width: {_width}')
+        self.browser.driver.set_window_size(_width, _height)
+        self._sleep()
+        print(f'{_width}x{_height}')
 
         _total = self._get_total_page()
         if _total is None:
@@ -86,13 +80,6 @@ class Manager(AbstractManager):
 
         self._move_first_page()
         self._sleep()
-
-        # re-resize by source
-        _canvas = self.browser.find_by_css('canvas').first._element
-        _width = int(_canvas.get_attribute('width'))
-        _height = 1200 if _width < 1000 and self.config.window_size['height'] > 1500 else self.config.window_size['height']
-        self.browser.driver.set_window_size(_width, _height)
-        print(f'{_width}x{_height}')
 
         while self._get_current_page() != 1:
             time.sleep(0.1)

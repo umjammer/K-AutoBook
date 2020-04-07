@@ -4,7 +4,7 @@
 """
 
 from enum import IntEnum
-from config import AbstractConfig, ImageFormat
+from config import AbstractConfig
 
 
 class BoundOnSide(IntEnum):
@@ -45,12 +45,6 @@ class Config(AbstractConfig):
         """
         本の綴じ場所
         """
-        self.window_size = {'width': 960, 'height': 1200}
-        """
-        ウィンドウサイズ
-        width: 横幅
-        height: 高さ
-        """
         self.blank_check_excludes = set()
         """
         black page checking excludes pages, negative number or zero means (total - 1 + negative_number)
@@ -78,11 +72,6 @@ class Config(AbstractConfig):
             self.blank_check_excludes = eval(data['blank_check_excludes'])
         if 'blank_check_giveup' in data:
             self.blank_check_giveup = data['blank_check_giveup']
-        if 'window_size' in data:
-            if 'width' in data['window_size']:
-                self.window_size['width'] = int(data['window_size']['width'])
-            if 'height' in data['window_size']:
-                self.window_size['height'] = int(data['window_size']['height'])
 
     def _set_bound_on_side(self, bound_on_side):
         """

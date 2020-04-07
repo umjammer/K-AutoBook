@@ -11,7 +11,7 @@ Types available.
 |site|method|image|size|note|sample url|
 |----|------|-----|----|----|----------|
 |[alphapolis](http://www.alphapolis.co.jp/)|meta|direct file|auto| |[⚓](http://www.alphapolis.co.jp/manga/viewManga/46) [⚓](http://www.alphapolis.co.jp/manga/viewOpening/138000030/)|
-|[ebookjapan](http://ebookjapan.yahoo.co.jp/)|paging|screen capture|manual|need to specify size for every volume|[⚓](https://ebookjapan.yahoo.co.jp/books/145222/A000100547)|
+|[ebookjapan](http://ebookjapan.yahoo.co.jp/)|paging|screen capture|auto| |[⚓](https://ebookjapan.yahoo.co.jp/books/145222/A000100547)|
 |[bookpass](https://bookpass.auone.jp/)|paging|canvas data|auto| |[⚓](https://bookpass.auone.jp/pack/detail/?iid=BT000069318400100101&cs=top_freecomics_reco_670&pos=2&tab=1&ajb=3)|
 |[bookwalker](https://bookwalker.jp/)|paging|canvas data|auto| |[⚓](https://viewer.bookwalker.jp/browserWebApi/03/view?cid=57c84cf2-7062-4ef9-9071-45fb249c926e)|
 |[comicdays](https://comic-days.com/)|meta|direct file (re-rendered)|auto| |[⚓](https://comic-days.com/volume/13932016480030155016)|
@@ -41,6 +41,7 @@ Types available.
 ```shell
     $ pwd
     .../K-AutoBook
+    $ cp config.json.sample config.json
     $ ./k_auto_book.py
     Input URL > <specify the url or python script starts with '?'> <option>
 ```
@@ -58,7 +59,7 @@ As input data
 ```shell
 Input URL > https://manga.line.me/book/viewer?id=001si9is
  :
-Input URL > https://ebookjapan.yahoo.co.jp/books/154784/A002338262/ {"window_size":{"width":900,"height":1352}}
+Input URL > https://ebookjapan.yahoo.co.jp/books/154784/A002338262/
  :
 Input URL > ?[f'https://web-ace.jp/youngaceup/contents/1000032/episode/{n}/' for n in range(615, 655)]
 ```
@@ -67,6 +68,8 @@ As a command line argument
 
 ```shell
 $ ./k_auto_book.py 'https://zebrack-comic.com/title/1591/volume/9727' 
+:
+$ ./k_auto_book.py '?[f"https://booklive.jp/bviewer/s/?cid=731240_00{n}" for n in range(2, 6)]'
 ```
 
 ## Author

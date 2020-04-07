@@ -128,8 +128,8 @@ class AbstractManager(ABC):
     def _is_config_jpeg(self):
         return self.config is not None and self.config.image_format == ImageFormat.JPEG
 
-    def _sleep(self):
-        time.sleep(self._sleep_time)
+    def _sleep(self, sec=None):
+        time.sleep(self._sleep_time if not sec else sec)
 
     def _press_key(self, key):
         """
