@@ -67,7 +67,6 @@ class Manager(AbstractManager):
         _total = self._get_total_page()
         if _total is None:
             return '全ページ数の取得に失敗しました'
-        self._set_total(_total)
 
         _excludes = self._get_blank_check_exclude_pages(_total)
         print(f'excludes: {_excludes}')
@@ -84,6 +83,7 @@ class Manager(AbstractManager):
         while self._get_current_page() != 1:
             time.sleep(0.1)
 
+        self._set_total(_total)
         for _count in range(0, _total):
 
             self.retry_count = 0
