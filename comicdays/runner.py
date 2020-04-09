@@ -7,9 +7,9 @@ import sys
 from os import path
 from datetime import datetime
 from config import BasicSubConfig
+from manager import CoreViewManager
 from runner import AbstractRunner
 from comicdays.login import YahooLogin
-from comicdays.manager import Manager
 
 
 class Runner(AbstractRunner):
@@ -56,7 +56,7 @@ class Runner(AbstractRunner):
         _destination = self.get_id()
         print(f'Output Path : {_destination}')
 
-        _manager = Manager(self.browser, self.sub_config, _destination)
+        _manager = CoreViewManager(self.browser, self.sub_config, _destination)
         _result = _manager.start()
         if _result is not True:
             print(_result)

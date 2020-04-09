@@ -5,11 +5,13 @@
 
 import base64
 import io
+import json
 import math
+import requests
 import time
 from abc import ABC, abstractmethod
+from io import BytesIO
 from os import path, listdir, makedirs
-import requests
 from PIL import Image
 from requests.adapters import HTTPAdapter
 from selenium.webdriver.common.action_chains import ActionChains
@@ -247,3 +249,50 @@ def decrypt_coreview_image(src, MULTIPLE=8, DIVIDE_NUM=4):
         s = math.floor(i / DIVIDE_NUM) * ch
         dest.paste(src.crop((n, t, n + cw, t + ch)), (o, s, o + cw, s + ch))
     return dest
+
+
+class CoreViewManager(AbstractManager):
+    """
+    coreview の操作を行うためのクラス
+
+    http://redsquirrel87.altervista.org/doku.php/manga-downloader and cfr :P
+    """
+
+    def __init__(self, browser, config=None, directory='./', prefix=''):
+        """
+        coreview の操作を行うためのコンストラクタ
+        @param browser splinter のブラウザインスタンス
+        """
+        super().__init__(browser, config, directory, prefix)
+
+        self._image_type = None
+
+    def start(self, url=None):
+        """
+        @return エラーが合った場合にエラーメッセージを、成功時に True を返す
+        """
+        self._wait()
+
+        _script = self.browser.find_by_id('episode-json').first._element
+        _json = json.loads(_script.get_attribute('data-value'))
+        self._image_type = _json['readableProduct']['pageStructure']['choJuGiga']
+        _pages = [x for x in _json['readableProduct']['pageStructure']['pages'] if x['type'] == 'main']
+        self._set_total(len(_pages))
+
+        session = self._get_session()
+
+        for i, page in enumerate(_pages):
+            self.fetch_page(session, page['src'], i)
+            self.pbar.update(1)
+            self._sleep()
+
+        return True
+
+    def fetch_page(self, session, url, count):
+        if self._image_type == 'usagi':
+            _image = Image.open(BytesIO(session.get(url).content))
+        else:
+            _image = decrypt_coreview_image(Image.open(BytesIO(session.get(url).content)))
+        if self._is_config_jpeg():
+            _image = _image.convert('RGB')
+        self._save_image(count, _image)
