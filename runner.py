@@ -8,6 +8,8 @@ import os
 import re
 import importlib
 from abc import ABC, abstractmethod
+from config import BasicSubConfig
+from manager import CoreViewManager
 
 
 class AbstractRunner(ABC):
@@ -164,3 +166,29 @@ class AbstractRunner(ABC):
         for i in cookies:
             # print(f"{i}: {cookies[i]}")
             driver.add_cookie({'name': i, 'value': cookies[i]})
+
+
+class DirectPageRunner(AbstractRunner):
+    """
+    Runner for the first page is viewer direct.
+    """
+
+    def _run(self, type_, manager_class=CoreViewManager):
+        """
+        Runs runner
+        """
+        self.sub_config = BasicSubConfig()
+        if type_ in self.config.raw:
+            self.sub_config.update(self.config.raw[type_])
+
+        print('Loading page of inputted url (%s)' % self.url)
+        self.browser.visit(self.url)
+
+        # _destination = input('Output Path > ')
+        _destination = self.get_id()
+        print(f'Output Path : {_destination}')
+
+        _manager = manager_class(self.browser, self.sub_config, _destination)
+        _result = _manager.start()
+        if _result is not True:
+            print(_result)
