@@ -3,15 +3,14 @@
 zebrackcomic の実行クラスモジュール
 """
 
-import re
 import sys
 import time
 from os import path
 from datetime import datetime
+from config import BasicSubConfig
 from runner import AbstractRunner
 from zebrackcomic.login import YahooLogin
 from zebrackcomic.manager import Manager
-from zebrackcomic.config import Config as ZebrackcomicConfig
 
 
 class Runner(AbstractRunner):
@@ -39,7 +38,7 @@ class Runner(AbstractRunner):
         """
         zebrack-comic の実行
         """
-        self.sub_config = ZebrackcomicConfig()
+        self.sub_config = BasicSubConfig()
         if 'zebrackcomic' in self.config.raw:
             self.sub_config.update(self.config.raw['zebrackcomic'])
 

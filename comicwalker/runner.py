@@ -6,10 +6,10 @@ comicwalker の実行クラスモジュール
 import sys
 from os import path
 from datetime import datetime
+from config import BasicSubConfig
 from runner import AbstractRunner
 from comicwalker.login import YahooLogin
 from comicwalker.manager import Manager
-from comicwalker.config import Config as ComicwalkerConfig
 
 
 class Runner(AbstractRunner):
@@ -37,7 +37,7 @@ class Runner(AbstractRunner):
         """
         comic-walker の実行
         """
-        self.sub_config = ComicwalkerConfig()
+        self.sub_config = BasicSubConfig()
         if 'comicwalker' in self.config.raw:
             self.sub_config.update(self.config.raw['comicwalker'])
 

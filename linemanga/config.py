@@ -3,10 +3,10 @@
 line manga の設定モジュール
 """
 
-from config import AbstractConfig
+from config import BasicSubConfig
 
 
-class Config(AbstractConfig):
+class SubConfig(BasicSubConfig):
     """
     設定情報を管理するためのクラス
     """
@@ -18,14 +18,6 @@ class Config(AbstractConfig):
         """
         super().__init__()
 
-        self.username = None
-        """
-        ID
-        """
-        self.password = None
-        """
-        パスワード
-        """
         self.cookie = None
         """
         Cookie
@@ -38,9 +30,5 @@ class Config(AbstractConfig):
         """
         super().update(data)
 
-        if 'username' in data:
-            self.username = data['username']
-        if 'password' in data:
-            self.password = data['password']
         if 'cookie' in data:
             self.cookie = data['cookie']

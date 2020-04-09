@@ -9,7 +9,7 @@ from datetime import datetime
 from runner import AbstractRunner
 from ebookjapan.login import YahooLogin
 from ebookjapan.manager import Manager
-from ebookjapan.config import Config as EbookjapanConfig
+from ebookjapan.config import SubConfig
 
 
 class Runner(AbstractRunner):
@@ -38,7 +38,7 @@ class Runner(AbstractRunner):
         """
         ebookjapan の実行
         """
-        self.sub_config = EbookjapanConfig()
+        self.sub_config = SubConfig()
         if 'ebookjapan' in self.config.raw:
             self.sub_config.update(self.config.raw['ebookjapan'])
 

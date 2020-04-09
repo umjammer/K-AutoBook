@@ -3,10 +3,10 @@
 ブックストアの設定モジュール
 """
 
-from config import AbstractConfig, BoundOnSide
+from config import BoundOnSide, BasicSubConfig
 
 
-class Config(AbstractConfig):
+class SubConfig(BasicSubConfig):
     """
     設定情報を管理するためのクラス
     """
@@ -18,14 +18,6 @@ class Config(AbstractConfig):
         """
         super().__init__()
 
-        self.username = None
-        """
-        Yahoo! JAPAN ID
-        """
-        self.password = None
-        """
-        Yahoo! JAPAN ID のパスワード
-        """
         self.bound_on_side = BoundOnSide.LEFT
         """
         本の綴じ場所
@@ -47,10 +39,6 @@ class Config(AbstractConfig):
         """
         super().update(data)
 
-        if 'username' in data:
-            self.username = data['username']
-        if 'password' in data:
-            self.password = data['password']
         if 'bound_on_side' in data:
             self._set_bound_on_side(data['bound_on_side'])
         if 'blank_check_excludes' in data:

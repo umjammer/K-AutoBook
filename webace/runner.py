@@ -2,14 +2,14 @@
 """
 web-ace の実行クラスモジュール
 """
-import re
+
 import sys
 from os import path
 from datetime import datetime
+from config import BasicSubConfig
 from runner import AbstractRunner
 from webace.login import YahooLogin
 from webace.manager import Manager
-from webace.config import Config as WebaceConfig
 
 
 class Runner(AbstractRunner):
@@ -37,7 +37,7 @@ class Runner(AbstractRunner):
         """
         web-ace の実行
         """
-        self.sub_config = WebaceConfig()
+        self.sub_config = BasicSubConfig()
         if 'webace' in self.config.raw:
             self.sub_config.update(self.config.raw['webace'])
 

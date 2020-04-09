@@ -3,13 +3,13 @@
 line-manga の実行クラスモジュール
 """
 
+import time
 from os import path
 from datetime import datetime
 from runner import AbstractRunner
 from linemanga.login import LineLogin
 from linemanga.manager import Manager
-from linemanga.config import Config as LinemangaConfig
-import time
+from linemanga.config import SubConfig
 
 
 class Runner(AbstractRunner):
@@ -41,7 +41,7 @@ class Runner(AbstractRunner):
         """
         line-manga の実行
         """
-        self.sub_config = LinemangaConfig()
+        self.sub_config = SubConfig()
         if 'linemanga' in self.config.raw:
             self.sub_config.update(self.config.raw['linemanga'])
 

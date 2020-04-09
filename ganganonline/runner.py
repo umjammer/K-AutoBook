@@ -6,10 +6,10 @@ gangan-online の実行クラスモジュール
 import sys
 from os import path
 from datetime import datetime
+from config import BasicSubConfig
 from runner import AbstractRunner
 from ganganonline.login import YahooLogin
 from ganganonline.manager import Manager
-from ganganonline.config import Config as GanganonlineConfig
 
 
 class Runner(AbstractRunner):
@@ -37,7 +37,7 @@ class Runner(AbstractRunner):
         """
         gangan-online の実行
         """
-        self.sub_config = GanganonlineConfig()
+        self.sub_config = BasicSubConfig()
         if 'ganganonline' in self.config.raw:
             self.sub_config.update(self.config.raw['ganganonline'])
 

@@ -6,10 +6,10 @@ bookwalker の実行クラスモジュール
 import sys
 from os import path
 from datetime import datetime
+from config import BasicSubConfig
 from runner import AbstractRunner
 from bookwalker.login import YahooLogin
 from bookwalker.manager import Manager
-from bookwalker.config import Config as BookwalkerConfig
 
 
 class Runner(AbstractRunner):
@@ -39,7 +39,7 @@ class Runner(AbstractRunner):
         """
         bookwalker の実行
         """
-        self.sub_config = BookwalkerConfig()
+        self.sub_config = BasicSubConfig()
         if 'bookwalker' in self.config.raw:
             self.sub_config.update(self.config.raw['bookwalker'])
 

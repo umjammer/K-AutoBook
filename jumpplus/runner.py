@@ -6,10 +6,10 @@ jumpplus の実行クラスモジュール
 import sys
 from os import path
 from datetime import datetime
+from config import BasicSubConfig
 from runner import AbstractRunner
 from jumpplus.login import YahooLogin
 from comicdays.manager import Manager
-from jumpplus.config import Config as JumpplusConfig
 
 
 class Runner(AbstractRunner):
@@ -37,7 +37,7 @@ class Runner(AbstractRunner):
         """
         jumpplus の実行
         """
-        self.sub_config = JumpplusConfig()
+        self.sub_config = BasicSubConfig()
         if 'jumpplus' in self.config.raw:
             self.sub_config.update(self.config.raw['jumpplus'])
 

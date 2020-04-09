@@ -6,10 +6,10 @@ comic-days の実行クラスモジュール
 import sys
 from os import path
 from datetime import datetime
+from config import BasicSubConfig
 from runner import AbstractRunner
 from comicdays.login import YahooLogin
 from comicdays.manager import Manager
-from comicdays.config import Config as ComicdaysConfig
 
 
 class Runner(AbstractRunner):
@@ -37,7 +37,7 @@ class Runner(AbstractRunner):
         """
         comic-days の実行
         """
-        self.sub_config = ComicdaysConfig()
+        self.sub_config = BasicSubConfig()
         if 'comicdays' in self.config.raw:
             self.sub_config.update(self.config.raw['comicdays'])
 

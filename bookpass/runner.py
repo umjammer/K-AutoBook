@@ -6,10 +6,10 @@ bookpass の実行クラスモジュール
 import sys
 from os import path
 from datetime import datetime
+from config import BasicSubConfig
 from runner import AbstractRunner
 from bookpass.login import YahooLogin
 from bookpass.manager import Manager
-from bookpass.config import Config as BookpassConfig
 
 
 class Runner(AbstractRunner):
@@ -37,7 +37,7 @@ class Runner(AbstractRunner):
         """
         bookpass の実行
         """
-        self.sub_config = BookpassConfig()
+        self.sub_config = BasicSubConfig()
         if 'bookpass' in self.config.raw:
             self.sub_config.update(self.config.raw['bookpass'])
 

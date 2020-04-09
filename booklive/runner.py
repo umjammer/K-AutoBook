@@ -6,10 +6,10 @@ booklive の実行クラスモジュール
 import sys
 from os import path
 from datetime import datetime
+from config import BasicSubConfig
 from runner import AbstractRunner
 from booklive.login import YahooLogin
 from booklive.manager import Manager
-from booklive.config import Config as BookliveConfig
 
 
 class Runner(AbstractRunner):
@@ -37,7 +37,7 @@ class Runner(AbstractRunner):
         """
         booklive の実行
         """
-        self.sub_config = BookliveConfig()
+        self.sub_config = BasicSubConfig()
         if 'booklive' in self.config.raw:
             self.sub_config.update(self.config.raw['booklive'])
 

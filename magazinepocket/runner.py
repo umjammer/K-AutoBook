@@ -6,10 +6,10 @@ magazinepocket の実行クラスモジュール
 import sys
 from os import path
 from datetime import datetime
+from config import BasicSubConfig
 from runner import AbstractRunner
 from magazinepocket.login import YahooLogin
 from comicdays.manager import Manager
-from magazinepocket.config import Config as SubConfig
 
 
 class Runner(AbstractRunner):
@@ -37,7 +37,7 @@ class Runner(AbstractRunner):
         """
         magazinepocket の実行
         """
-        self.sub_config = SubConfig()
+        self.sub_config = BasicSubConfig()
         if 'magazinepocket' in self.config.raw:
             self.sub_config.update(self.config.raw['magazinepocket'])
 
