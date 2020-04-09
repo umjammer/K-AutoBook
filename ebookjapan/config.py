@@ -3,22 +3,7 @@
 ブックストアの設定モジュール
 """
 
-from enum import IntEnum
-from config import AbstractConfig
-
-
-class BoundOnSide(IntEnum):
-    """
-    本の綴じ場所情報
-    """
-    RIGHT = 1
-    """
-    右綴じ
-    """
-    LEFT = 2
-    """
-    左綴じ
-    """
+from config import AbstractConfig, BoundOnSide
 
 
 class Config(AbstractConfig):
@@ -72,23 +57,3 @@ class Config(AbstractConfig):
             self.blank_check_excludes = eval(data['blank_check_excludes'])
         if 'blank_check_giveup' in data:
             self.blank_check_giveup = data['blank_check_giveup']
-
-    def _set_bound_on_side(self, bound_on_side):
-        """
-        本の閉じ場所を設定する
-        使用できる場所は bookstore.BoundOnSide.BoundOnSide に記されている
-        @param bound_on_side 本の綴じ場所
-        """
-        if isinstance(bound_on_side, str):
-            _bound_on_side = bound_on_side.upper()
-            if _bound_on_side in {BoundOnSide.RIGHT.name, str(
-                    int(BoundOnSide.RIGHT))}:
-                self.bound_on_side = BoundOnSide.RIGHT
-            elif _bound_on_side in {BoundOnSide.LEFT.name, str(
-                    int(BoundOnSide.LEFT))}:
-                self.bound_on_side = BoundOnSide.LEFT
-        elif isinstance(bound_on_side, int):
-            if bound_on_side == BoundOnSide.RIGHT:
-                self.bound_on_side = BoundOnSide.RIGHT
-            elif bound_on_side == BoundOnSide.LEFT:
-                self.bound_on_side = BoundOnSide.LEFT

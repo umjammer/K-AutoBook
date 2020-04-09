@@ -3,7 +3,6 @@
 ebookjapan の実行クラスモジュール
 """
 
-import json
 import sys
 from os import path
 from datetime import datetime
