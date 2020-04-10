@@ -54,13 +54,14 @@ class Manager(AbstractManager):
             _imgs = self.browser.find_by_css(f"#content-p{_count + 1} div.pt-img img")
             _images = [self._get_image_by_url(_img._element.get_attribute('src')) for _img in _imgs]
             # print(f'images: {len(_images)}')
+            _hb = _images[-1].size[1]
             _w = _images[0].size[0]
-            _h = sum(_image.size[1] for _image in _images)
+            _h = sum(self._get_height(_image.size[1], _hb) for _image in _images)
             _dest = Image.new('RGB', (_w, _h))
             _hh = 0
             for _image in _images:
                 _dest.paste(_image, (0, _hh, _w, _hh + _image.size[1]))
-                _hh += _image.size[1]
+                _hh += self._get_height(_image.size[1], _hb)
             self._save_image(_count, _dest)
 
             self.pbar.update(1)
@@ -69,6 +70,21 @@ class Manager(AbstractManager):
             self._sleep()
 
         return True
+
+    @staticmethod
+    def _get_height(height, base):
+        """
+        TODO without any reasons
+        """
+        if base == 534:  # 1600
+            if height != base:
+                base = 533
+        elif base == 400:  # 1200
+            pass
+        else:
+            print(f'unknown base {base}')
+        _margin = height - base
+        return height - _margin
 
     def _get_total_page(self):
         """
@@ -101,7 +117,10 @@ class Manager(AbstractManager):
         現在のページを取得する
         @return 現在表示されているページ
         """
-        return int(self.current_page_element.html.split('/')[0])
+        try:
+            return int(self.current_page_element.html.split('/')[0])
+        except:
+            return 0
 
     def _next(self):
         """
@@ -109,6 +128,6 @@ class Manager(AbstractManager):
         """
         _current_page = self._get_current_page()
         self._press_key(self.next_key)
-        if self._get_current_page() < self.pbar.total - 1:
+        if self._get_current_page() and self._get_current_page() < self.pbar.total - 1:
             while self._get_current_page() != _current_page + 1:
                 time.sleep(0.1)

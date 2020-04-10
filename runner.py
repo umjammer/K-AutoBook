@@ -168,7 +168,7 @@ class AbstractRunner(ABC):
             driver.add_cookie({'name': i, 'value': cookies[i]})
 
 
-class DirectPageRunner(AbstractRunner):
+class DirectPageRunner(AbstractRunner, ABC):
     """
     Runner for the first page is viewer direct.
     """
