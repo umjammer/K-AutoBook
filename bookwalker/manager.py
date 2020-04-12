@@ -42,7 +42,7 @@ class Manager(AbstractManager):
         if _total is None:
             return '全ページ数の取得に失敗しました'
 
-        self._sleep()
+        self._sleep(2)
 
         # get original size
         _canvas = self.browser.driver.find_element_by_css_selector("canvas.dummy")
