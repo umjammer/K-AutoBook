@@ -172,7 +172,7 @@ class Manager(AbstractManager):
         _current_page = self._get_current_page()
         self._press_key(self.next_key)
         if self._get_current_page() and self._get_current_page() < self.pbar.total - 1:
-            while self._get_current_page() != _current_page + 1:
+            while self._get_current_page() and self._get_current_page() != _current_page + 1:
                 time.sleep(0.1)
 
     def _previous(self):
