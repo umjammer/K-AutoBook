@@ -57,16 +57,24 @@ class Runner(AbstractRunner):
         実際の本のページに移動する
         """
         time.sleep(3)
+
+        clazz = "div.karte-c"
+        self.browser.driver.execute_script(f'document.querySelector("{clazz}").style.display = "none";')
+
         _elements = self.browser.find_by_css('button.undefined')
         if len(_elements) != 0:
             _elements.first.click()
+            time.sleep(.5)
+
+            # skip dialog 2
             time.sleep(.5)
             try:
                 _elements = self.browser.driver.find_element_by_xpath("//*[text()='無料で読む']")
                 _elements.click()
                 return True
-            except Exception as e:
-                raise e
+            except Exception:
+                return True
+
         return False
 
     def need_reset(self):
