@@ -5,6 +5,7 @@ zebrack-comic の操作を行うためのクラスモジュール
 
 import re
 import time
+from retry import retry
 from selenium.webdriver.common.keys import Keys
 from manager import AbstractManager, get_file_content_chrome
 
@@ -44,7 +45,7 @@ class Manager(AbstractManager):
 
         for _count in range(0, _total):
 
-            img = self.browser.driver.find_element_by_xpath("//img[starts-with(@src, 'blob:')]")
+            img = self._get_img()
             self._save_image_of_bytes(_count, get_file_content_chrome(self.browser.driver, img.get_attribute('src')))
             self.pbar.update(1)
 
@@ -52,6 +53,10 @@ class Manager(AbstractManager):
             self._sleep()
 
         return True
+
+    @retry(tries=3, delay=1)
+    def _get_img(self):
+        return self.browser.driver.find_element_by_xpath("//img[starts-with(@src, 'blob:')]")
 
     def _get_total_page(self):
         """
