@@ -25,8 +25,8 @@ def _make_directory(directory):
         try:
             os.makedirs(directory)
         except OSError as exception:
-            print("ディレクトリの作成に失敗しました({0})".format(directory))
-            raise
+            print(f"Directory creation failed ({directory})")
+            raise exception
 
 
 def _initialize_browser(config):
@@ -67,9 +67,10 @@ def _main():
 
     _config = Config(_load_config_data())
     _make_directory(_config.log_directory)
+    _make_directory(_config.base_directory)
     _browser = _initialize_browser(_config)
 
-    _stripper = re.compile(r'^ +')
+    _stripper = re.compile(r'^\s+')
 
     _plugins = AbstractRunner.get_plugins()
     # print(f'{_plugins}')
@@ -124,7 +125,7 @@ def _main():
                     print('', flush=True)
                     _done = True
             if not _done:
-                print('入力されたURLはサポートしていません')
+                print('URL is not supported')
 
 
 _main()

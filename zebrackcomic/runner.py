@@ -36,8 +36,7 @@ class Runner(AbstractRunner):
         print('Loading page of inputted url (%s)' % self.url)
         self.browser.visit(self.url)
 
-        _destination = self.get_id()
-        # _destination = input('Output Path > ')
+        _destination = self.get_output_dir()
         print(f'Output Path : {_destination}')
 
         if self._move_main_page():

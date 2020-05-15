@@ -44,13 +44,16 @@ class Config(object):
         """
         ログを出力するディレクトリパス
         """
+        self.base_directory = 'data/'
+        """
+        Base directory for output
+        """
         self.raw = data
         """
         raw data
         """
         if isinstance(data, dict):
             self.update(data)
-        return
 
     def update(self, data):
         """
@@ -69,7 +72,8 @@ class Config(object):
             self.headless = bool(data['headless'])
         if 'log_directory' in data:
             self.log_directory = data['log_directory']
-        return
+        if 'base_directory' in data:
+            self.base_directory = data['base_directory']
 
 
 class ImageFormat(IntEnum):

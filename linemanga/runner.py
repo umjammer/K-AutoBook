@@ -66,8 +66,7 @@ class Runner(AbstractRunner):
 
         print('Open main page')
 
-#        _destination = input('Output Path > ')
-        _destination = self.get_id()
+        _destination = self.get_output_dir()
         print(f'Output Path : {_destination}')
 
         _manager = Manager(

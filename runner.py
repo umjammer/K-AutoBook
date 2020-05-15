@@ -69,7 +69,7 @@ class AbstractRunner(ABC):
         ブックストアで実行するためのコンストラクタ
         @param browser splinter のブラウザ情報
         @param url str アクセスする URL
-        @param config Config 設定情報
+        @param config global configuration
         @param options str オプション情報
         """
         self.browser = browser
@@ -84,12 +84,12 @@ class AbstractRunner(ABC):
 
         self.config = config
         """
-        設定
+        global configuration
         """
 
         self.sub_config = None
         """
-        各サイト設定
+        each site configuration
         """
 
         self.options = self.parse_options(options)
@@ -116,12 +116,15 @@ class AbstractRunner(ABC):
     def need_reset(self):
         return False
 
-    def get_id(self):
+    def _get_id(self):
         for _pattern in self.patterns:
             m = re.match(r'.*' + _pattern, self.url)
             # print(m)
             if m:
                 return str.join('-', m.groups())
+
+    def get_output_dir(self):
+        return os.path.join(self.config.base_directory, self._get_id())
 
     @staticmethod
     def get_plugins():
@@ -185,7 +188,7 @@ class DirectPageRunner(AbstractRunner, ABC):
         self.browser.visit(self.url)
 
         # _destination = input('Output Path > ')
-        _destination = self.get_id()
+        _destination = self.get_output_dir()
         print(f'Output Path : {_destination}')
 
         _manager = manager_class(self.browser, self.sub_config, _destination)

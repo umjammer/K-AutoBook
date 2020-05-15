@@ -41,8 +41,7 @@ class Runner(AbstractRunner):
             print('ページの取得に失敗しました')
             return
 
-        # _destination = input('Output Path > ')
-        _destination = self.get_id()
+        _destination = self.get_output_dir()
         print(f'Output Path : {_destination}')
 
         _manager = Manager(self.browser, self.sub_config, _destination)

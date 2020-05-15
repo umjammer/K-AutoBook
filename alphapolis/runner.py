@@ -31,7 +31,6 @@ class Runner(AbstractRunner):
         """
         アルファポリスの実行
         """
-        # _destination = input('Output Path > ')
-        _destination = self.get_id()
+        _destination = self.get_output_dir()
         _manager = Manager(self.browser, None, _destination)
         _manager.start(self.url)
