@@ -21,7 +21,7 @@ Downloadable sites available,
 |[linemanga](https://manga.line.me/)|paging|screen capture|needs to update cookie|[📖](https://manga.line.me/book/viewer?id=92dc0b4e-c5d4-4518-9fba-d78fb1e6b0f0)|
 |[webace](https://web-ace.jp/)|meta|direct file| |[📖](https://web-ace.jp/youngaceup/contents/1000053/episode/1092/)|
 |[zebrackcomic](https://zebrack-comic.com/)|paging|direct file (blob)| |[📖](https://zebrack-comic.com/title/37/volume/1498/viewer)|
-|[booklive](https://booklive.jp/)|paging|direct file (blob, re-rendered)| |[📖]('https://booklive.jp/bviewer/s/?cid=208562_003&rurl=https%3A%2F%2Fbooklive.jp%2Findex%2Fno-charge%2Fcategory_id%2FC)|
+|[booklive](https://booklive.jp/)|paging|direct file (blob, re-rendered)| |[📖](https://booklive.jp/bviewer/s/?cid=208562_003&rurl=https%3A%2F%2Fbooklive.jp%2Findex%2Fno-charge%2Fcategory_id%2FC)|
 |[jumpplus](https://shonenjumpplus.com/)|meta|direct file (re-rendered)|coreview|[📖](https://shonenjumpplus.com/episode/13932016480031086197)|
 |[magazinepocket](https://pocket.shonenmagazine.com/)|meta|direct file (re-rendered)|coreview|[📖](https://pocket.shonenmagazine.com/episode/13933686331610373465)|
 |[kuragebunch](https://kuragebunch.com/)|meta|direct file (re-rendered)|coreview|[📖](https://kuragebunch.com/episode/10834108156630826048)|
