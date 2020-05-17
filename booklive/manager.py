@@ -81,6 +81,8 @@ class Manager(AbstractManager):
                 base = 533
         elif base == 400:  # 1200
             pass
+        elif base == 640:  # ?
+            pass
         else:
             print(f'unknown base {base}')
         _margin = height - base

@@ -18,7 +18,7 @@ class Runner(DirectPageRunner):
     サポートするドメイン
     """
 
-    patterns = ['bviewer\\/s\\/\\?cid=(\\d{6}_\\d{3})']
+    patterns = ['bviewer\\/s\\/\\?cid=(\\d{6,8}_\\d{3})']
     """
     サポートする booklive のパスの正規表現のパターンのリスト
     """
