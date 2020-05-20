@@ -23,7 +23,7 @@ class Manager(AbstractManager):
         """
         super().__init__(browser, config, directory, prefix)
 
-        self.cid = directory
+        self.cid = directory[directory.rfind('/') + 1:]
         """
         cid TODO ad-hoc
         """
