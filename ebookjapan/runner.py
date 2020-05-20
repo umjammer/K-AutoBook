@@ -119,7 +119,7 @@ class Runner(AbstractRunner):
         実際の本の試し読みページに移動する
         """
         _elements = self.browser.find_by_css('.book-main__purchase > a.btn')
-        if len(_elements) != 0 and _elements.first.text == '試し読み':
+        if len(_elements) != 0 and '試し読み' in _elements.first.text:
             _elements.first.click()
             return True
         return False
