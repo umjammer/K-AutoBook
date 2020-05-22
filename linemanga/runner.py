@@ -46,16 +46,18 @@ class Runner(AbstractRunner):
             self.sub_config.update(self.config.raw['linemanga'])
 
         try:
-            self.browser.driver.get('https://manga.line.me/')
-            self.browser.driver.delete_all_cookies()
-            self._add_cookies(self.browser.driver, self._get_cookie_dict(self.sub_config.cookie))
+            cookie = self._get_cookie('manga.line.me')
+            if cookie:
+                self.browser.driver.get('https://manga.line.me/')
+                self.browser.driver.delete_all_cookies()
+                self._add_cookies(self.browser.driver, self._get_cookie_dict(cookie))
 
-            self.browser.driver.get('https://manga.line.me/store/')
-            time.sleep(1)
-
-            if (self.sub_config.needs_login and
-                    not self._is_login() and not self._login()):
-                return
+                self.browser.driver.get('https://manga.line.me/store/')
+                time.sleep(1)
+            else:
+                if (self.sub_config.needs_login and
+                        not self._is_login() and not self._login()):
+                    return
         except Exception as err:
             _filename = 'login_error_%s.png' % datetime.now().strftime('%s')
             self.browser.driver.save_screenshot(
@@ -75,6 +77,9 @@ class Runner(AbstractRunner):
         if _result is not True:
             print(_result)
         return
+
+    def _save_sub_cookie(self, cookie):
+        self.config.save_sub_cookie('linemanga', cookie)
 
     def _is_login(self):
         """

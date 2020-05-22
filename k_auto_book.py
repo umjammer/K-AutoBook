@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # --- coding: utf-8 ---
 
-import json
 import os
 import re
 import sys
@@ -10,14 +9,6 @@ from splinter import Browser
 from selenium.webdriver import ChromeOptions
 from config import Config
 from runner import AbstractRunner
-
-
-def _load_config_data():
-    _file = open(
-        path.join(path.abspath(path.dirname(__file__)), 'config.json'), 'r')
-    _data = json.load(_file)
-    _file.close()
-    return _data
 
 
 def _make_directory(directory):
@@ -65,7 +56,7 @@ def _main():
     $ python k_auto_book.py '?python script'
     """
 
-    _config = Config(_load_config_data())
+    _config = Config()
     _make_directory(_config.log_directory)
     _make_directory(_config.base_directory)
     _browser = _initialize_browser(_config)
@@ -128,4 +119,5 @@ def _main():
                 print('URL is not supported')
 
 
-_main()
+if __name__ == '__main__':
+    _main()

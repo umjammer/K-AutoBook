@@ -3,19 +3,25 @@
 設定クラスモジュール
 """
 
+import json
+import keyring
+import sqlite3
 from abc import ABC
+from Crypto.Cipher import AES
+from Crypto.Protocol.KDF import PBKDF2
 from enum import IntEnum
+from os import path
 
 
-class Config(object):
+class Config:
     """
     設定情報を管理するためのクラス
     """
+    _file_name = 'config.json'
 
-    def __init__(self, data=None):
+    def __init__(self):
         """
         設定情報を管理するためのコンストラクタ
-        @param data 設定情報
         """
         self.driver = 'phantomjs'
         """
@@ -48,32 +54,50 @@ class Config(object):
         """
         Base directory for output
         """
-        self.raw = data
+        self.chrome_cookie_db = None
+        """
+        Chrome Cookie database file name
+        """
+        self.raw = self._load()
         """
         raw data
         """
-        if isinstance(data, dict):
-            self.update(data)
+        if isinstance(self.raw, dict):
+            self.update()
 
-    def update(self, data):
+    def update(self):
         """
         設定情報を更新する
-        @param data 更新するデータ
         """
-        if 'driver' in data:
-            self.driver = data['driver']
-        if 'user_agent' in data:
-            self.user_agent = data['user_agent']
-        if 'chrome_path' in data:
-            self.chrome_path = data['chrome_path']
-        if 'chrome_binary' in data:
-            self.chrome_binary = data['chrome_binary']
-        if 'headless' in data:
-            self.headless = bool(data['headless'])
-        if 'log_directory' in data:
-            self.log_directory = data['log_directory']
-        if 'base_directory' in data:
-            self.base_directory = data['base_directory']
+        if 'driver' in self.raw:
+            self.driver = self.raw['driver']
+        if 'user_agent' in self.raw:
+            self.user_agent = self.raw['user_agent']
+        if 'chrome_path' in self.raw:
+            self.chrome_path = self.raw['chrome_path']
+        if 'chrome_binary' in self.raw:
+            self.chrome_binary = self.raw['chrome_binary']
+        if 'headless' in self.raw:
+            self.headless = bool(self.raw['headless'])
+        if 'log_directory' in self.raw:
+            self.log_directory = self.raw['log_directory']
+        if 'base_directory' in self.raw:
+            self.base_directory = self.raw['base_directory']
+        if 'chrome_cookie_db' in self.raw:
+            self.chrome_cookie_db = self.raw['chrome_cookie_db']
+
+    @staticmethod
+    def _load():
+        _path = path.join(path.abspath(path.dirname(__file__)), Config._file_name)
+        with open(_path, 'r') as _file:
+            _data = json.load(_file)
+        return _data
+
+    def save_sub_cookie(self, sub_key, cookie):
+        self.raw[sub_key]['cookie'] = cookie
+        _path = path.join(path.abspath(path.dirname(__file__)), Config._file_name)
+        with open(_path, 'w') as _file:
+            json.dump(self.raw, _file, indent=4, sort_keys=False)
 
 
 class ImageFormat(IntEnum):
@@ -110,7 +134,6 @@ class AbstractConfig(ABC):
     def __init__(self):
         """
         設定情報を管理するためのコンストラクタ
-        @param data 設定情報
         """
         self.needs_login = False
         """
@@ -179,10 +202,9 @@ class BasicSubConfig(AbstractConfig):
     設定情報を管理するためのクラス
     """
 
-    def __init__(self, data=None):
+    def __init__(self):
         """
         設定情報を管理するためのコンストラクタ
-        @param data 設定情報
         """
         super().__init__()
 
@@ -206,3 +228,79 @@ class BasicSubConfig(AbstractConfig):
             self.username = data['username']
         if 'password' in data:
             self.password = data['password']
+
+
+class _AESCipher:
+
+    def __init__(self, key):
+        self.key = key
+
+    def decrypt(self, text):
+        cipher = AES.new(self.key, AES.MODE_CBC, IV=(' ' * 16))
+        return self._unpad(cipher.decrypt(text))
+
+    @staticmethod
+    def _unpad(s):
+        return s[:-ord(s[len(s) - 1:])]
+
+
+class ChromeCookie:
+    """
+    currently MacOS only
+    https://gist.github.com/kosh04/36cf6023fb75b516451ce933b9db2207
+    windows
+    https://stackoverflow.com/questions/60230456/dpapi-fails-with-cryptographicexception-when-trying-to-decrypt-chrome-cookies/60611673#60611673
+    """
+
+    # NOTE: Chrome uses Win32_FILETIME format
+    # NOTE: 11644473600 == strftime('%s', '1601-01-01')
+    _sql = """
+        SELECT
+          host_key,
+          path,
+          is_secure,
+          name,
+          value,
+          encrypted_value,
+          ((expires_utc / 1000000) - 11644473600)
+        FROM
+          cookies
+        WHERE
+          host_key like ?
+    """
+
+    def __init__(self, db):
+        # TODO does this work on windows???
+        password = keyring.get_password('Chrome Safe Storage', 'Chrome').encode()
+        salt = b'saltysalt'
+        length = 16
+        iterations = 1003
+        key = PBKDF2(password, salt, length, iterations)
+
+        self._cipher = _AESCipher(key)
+        self._db = db
+
+    def get_cookie(self, host_key):
+
+        cookie = ""
+
+        conn = sqlite3.connect(self._db)
+        result_set = conn.execute(ChromeCookie._sql, ('%' + host_key + '%',))
+
+        for _host_key, _path, is_secure, name, _value, encrypted_value, _exptime in result_set:
+
+            value = _value
+            if encrypted_value[:3] == b'v10':
+                encrypted_value = encrypted_value[3:]  # Trim prefix 'v10'
+                value = self._cipher.decrypt(encrypted_value)
+                value = value.decode()
+
+            # exptime = max(_exptime, 0)
+            # secure = str(bool(is_secure)).upper()
+
+            # print(_host_key, 'TRUE', _path, secure, exptime, name, value, sep='\t')
+            cookie += name + "=" + value + "; "
+
+        conn.close()
+
+        return None if not cookie else cookie[:-2]

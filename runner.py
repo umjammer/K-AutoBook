@@ -8,7 +8,7 @@ import os
 import re
 import importlib
 from abc import ABC, abstractmethod
-from config import BasicSubConfig
+from config import BasicSubConfig, ChromeCookie
 from manager import CoreViewManager
 
 
@@ -154,6 +154,20 @@ class AbstractRunner(ABC):
                             class_list.append(attr)
         # print(f'{class_list}')
         return class_list
+
+    def _get_cookie(self, host_key):
+        if self.sub_config.cookie:
+            # TODO check expiry automatically
+            return self.sub_config.cookie
+        elif self.config.chrome_cookie_db:
+            cookie = ChromeCookie(self.config.chrome_cookie_db).get_cookie(host_key)
+            self._save_sub_cookie(cookie)
+            return cookie
+        else:
+            return None
+
+    def _save_sub_cookie(self, cookie):
+        pass
 
     @staticmethod
     def _get_cookie_dict(cookies):
