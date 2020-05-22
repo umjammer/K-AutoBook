@@ -3,6 +3,7 @@
 gangan-online の操作を行うためのクラスモジュール
 """
 
+from retry import retry
 from selenium.webdriver.common.keys import Keys
 from tqdm import tqdm
 from manager import AbstractManager, get_file_content_chrome
@@ -39,7 +40,7 @@ class Manager(AbstractManager):
         _count = 0
         while True:
 
-            img = self.browser.driver.find_element_by_xpath("//img[starts-with(@src, 'blob:')]")
+            img = self._get_img()
             try:
                 self.browser.driver.find_element_by_xpath("//button[text() = '閉じる']")
                 break
@@ -54,6 +55,10 @@ class Manager(AbstractManager):
                 _count = _count + 1
 
         return True
+
+    @retry(tries=3, delay=1)
+    def _get_img(self):
+        return self.browser.driver.find_element_by_xpath("//img[starts-with(@src, 'blob:')]")
 
     def _next(self):
         """
