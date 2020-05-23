@@ -7,6 +7,7 @@ import json
 import keyring
 import sqlite3
 from abc import ABC
+from contextlib import closing
 from Crypto.Cipher import AES
 from Crypto.Protocol.KDF import PBKDF2
 from enum import IntEnum
@@ -236,7 +237,7 @@ class _AESCipher:
         self.key = key
 
     def decrypt(self, text):
-        cipher = AES.new(self.key, AES.MODE_CBC, IV=(' ' * 16))
+        cipher = AES.new(self.key, AES.MODE_CBC, IV=(b' ' * 16))
         return self._unpad(cipher.decrypt(text))
 
     @staticmethod
@@ -284,23 +285,21 @@ class ChromeCookie:
 
         cookie = ""
 
-        conn = sqlite3.connect(self._db)
-        result_set = conn.execute(ChromeCookie._sql, ('%' + host_key + '%',))
+        with closing(sqlite3.connect(self._db)) as conn:
+            result_set = conn.execute(ChromeCookie._sql, ('%' + host_key + '%',))
 
-        for _host_key, _path, is_secure, name, _value, encrypted_value, _exptime in result_set:
+            for _host_key, _path, is_secure, name, _value, encrypted_value, _exptime in result_set:
 
-            value = _value
-            if encrypted_value[:3] == b'v10':
-                encrypted_value = encrypted_value[3:]  # Trim prefix 'v10'
-                value = self._cipher.decrypt(encrypted_value)
-                value = value.decode()
+                value = _value
+                if encrypted_value[:3] == b'v10':
+                    encrypted_value = encrypted_value[3:]  # Trim prefix 'v10'
+                    value = self._cipher.decrypt(encrypted_value)
+                    value = value.decode()
 
-            # exptime = max(_exptime, 0)
-            # secure = str(bool(is_secure)).upper()
+                # exptime = max(_exptime, 0)
+                # secure = str(bool(is_secure)).upper()
 
-            # print(_host_key, 'TRUE', _path, secure, exptime, name, value, sep='\t')
-            cookie += name + "=" + value + "; "
-
-        conn.close()
+                # print(_host_key, 'TRUE', _path, secure, exptime, name, value, sep='\t')
+                cookie += name + "=" + value + "; "
 
         return None if not cookie else cookie[:-2]

@@ -7,4 +7,4 @@ Pillow==7.1.2
 selenium==3.141.0
 splinter==0.13.0
 keyring~=21.2.1
-pycrypto==2.6.1
+pycryptodome==3.9.7
