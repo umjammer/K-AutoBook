@@ -37,11 +37,9 @@ Downloadable sites available,
 ## Install
 
 ```shell
-    $ brew install gmp  # for pycrypto
-
     $ git clone https://github.com/umjammer/K-AutoBook.git
     $ cd K-AutoBook
-    $ pip CFLAGS="-I/usr/local/include -L/usr/local/lib" install -r requirements.txt
+    $ pip install -r requirements.txt
 ```
 
 ## Usage
