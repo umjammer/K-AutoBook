@@ -4,12 +4,12 @@ line-manga の実行クラスモジュール
 """
 
 import time
+from config import SubConfigWithCookie
 from os import path
 from datetime import datetime
 from runner import AbstractRunner
 from linemanga.login import LineLogin
 from linemanga.manager import Manager
-from linemanga.config import SubConfig
 
 
 class Runner(AbstractRunner):
@@ -41,17 +41,12 @@ class Runner(AbstractRunner):
         """
         line-manga の実行
         """
-        self.sub_config = SubConfig()
+        self.sub_config = SubConfigWithCookie()
         if 'linemanga' in self.config.raw:
             self.sub_config.update(self.config.raw['linemanga'])
 
         try:
-            cookie = self._get_cookie('manga.line.me')
-            if cookie:
-                self.browser.driver.get('https://manga.line.me/')
-                self.browser.driver.delete_all_cookies()
-                self._add_cookies(self.browser.driver, self._get_cookie_dict(cookie))
-
+            if self._set_cookie('manga.line.me', 'https://manga.line.me/'):
                 self.browser.driver.get('https://manga.line.me/store/')
                 time.sleep(1)
             else:

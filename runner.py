@@ -167,7 +167,7 @@ class AbstractRunner(ABC):
             return None
 
     def _save_sub_cookie(self, cookie):
-        pass
+        raise Exception('not implemented yet')
 
     @staticmethod
     def _get_cookie_dict(cookies):
@@ -184,19 +184,37 @@ class AbstractRunner(ABC):
             # print(f"{i}: {cookies[i]}")
             driver.add_cookie({'name': i, 'value': cookies[i]})
 
+    def _set_cookie(self, host_key, top_url):
+        """
+        should be call after self.sub_config setup
+        """
+        cookie = self._get_cookie(host_key)
+        if cookie:
+            self.browser.driver.get(top_url)
+            self.browser.driver.delete_all_cookies()
+            self._add_cookies(self.browser.driver, self._get_cookie_dict(cookie))
+            return True
+        else:
+            return False
+
 
 class DirectPageRunner(AbstractRunner, ABC):
     """
     Runner for the first page is viewer direct.
     """
 
-    def _run(self, type_, manager_class=CoreViewManager):
+    def _run(self, type_, manager_class=CoreViewManager,
+             sub_config_class=BasicSubConfig, host_key=None, top_url=None):
         """
         Runs runner
         """
-        self.sub_config = BasicSubConfig()
+        self.sub_config = sub_config_class()
         if type_ in self.config.raw:
             self.sub_config.update(self.config.raw[type_])
+
+        if self.config.chrome_cookie_db and host_key and top_url:
+            if self._set_cookie( host_key, top_url):
+                print('cookie has set')
 
         print('Loading page of inputted url (%s)' % self.url)
         self.browser.visit(self.url)

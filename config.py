@@ -95,6 +95,8 @@ class Config:
         return _data
 
     def save_sub_cookie(self, sub_key, cookie):
+        if sub_key not in self.raw:
+            self.raw[sub_key] = dict()
         self.raw[sub_key]['cookie'] = cookie
         _path = path.join(path.abspath(path.dirname(__file__)), Config._file_name)
         with open(_path, 'w') as _file:
@@ -229,6 +231,30 @@ class BasicSubConfig(AbstractConfig):
             self.username = data['username']
         if 'password' in data:
             self.password = data['password']
+
+
+class SubConfigWithCookie(BasicSubConfig):
+    """
+    with cookie sub config
+    """
+
+    def __init__(self):
+        super().__init__()
+
+        self.cookie = None
+        """
+        Cookie
+        """
+
+    def update(self, data):
+        """
+        設定情報を更新する
+        @param data 更新するデータ
+        """
+        super().update(data)
+
+        if 'cookie' in data:
+            self.cookie = data['cookie']
 
 
 class _AESCipher:

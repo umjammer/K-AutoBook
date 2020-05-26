@@ -3,6 +3,7 @@
 comic-cmoa の実行クラスモジュール
 """
 
+from config import SubConfigWithCookie
 from runner import DirectPageRunner
 from booklive.manager import Manager
 
@@ -27,4 +28,7 @@ class Runner(DirectPageRunner):
         """
         comic-cmoa の実行
         """
-        self._run('cmoa', Manager)
+        self._run('cmoa', Manager, SubConfigWithCookie, 'cmoa.jp', 'https://www.cmoa.jp/')
+
+    def _save_sub_cookie(self, cookie):
+        self.config.save_sub_cookie('cmoa', cookie)

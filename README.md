@@ -25,7 +25,7 @@ Downloadable sites available,
 |[jumpplus](https://shonenjumpplus.com/)|meta|direct file (re-rendered)|coreview|[📖](https://shonenjumpplus.com/episode/13932016480031086197)|
 |[magazinepocket](https://pocket.shonenmagazine.com/)|meta|direct file (re-rendered)|coreview|[📖](https://pocket.shonenmagazine.com/episode/13933686331610373465)|
 |[kuragebunch](https://kuragebunch.com/)|meta|direct file (re-rendered)|coreview|[📖](https://kuragebunch.com/episode/10834108156630826048)|
-|[cmoa](https://www.cmoa.jp/)|paging|direct file (blob, re-rendered)|uses booklive manager|[📖](https://www.cmoa.jp/bib/speedreader/speed.html?cid=0000101745_jp_0002&u0=1&u1=0&rurl=https%3A%2F%2Fwww.cmoa.jp%2Ftitle%2F101745%2Fvol%2F2%2F)|
+|[cmoa](https://www.cmoa.jp/)|paging|direct file (blob, re-rendered)|uses booklive manager, cookie available|[📖](https://www.cmoa.jp/bib/speedreader/speed.html?cid=0000101745_jp_0002&u0=1&u1=0&rurl=https%3A%2F%2Fwww.cmoa.jp%2Ftitle%2F101745%2Fvol%2F2%2F)|
 |[comicaction](https://comic-action.com/)|meta|direct file (re-rendered)|coreview|[📖](https://https://comic-action.com/episode/13933686331636733009)|
 
 ## Requirement
