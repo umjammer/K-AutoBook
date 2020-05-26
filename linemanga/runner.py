@@ -46,7 +46,7 @@ class Runner(AbstractRunner):
             self.sub_config.update(self.config.raw['linemanga'])
 
         try:
-            if self._set_cookie('manga.line.me', 'https://manga.line.me/'):
+            if self._set_cookie('linemanga', 'manga.line.me', 'https://manga.line.me/'):
                 self.browser.driver.get('https://manga.line.me/store/')
                 time.sleep(1)
             else:
@@ -72,9 +72,6 @@ class Runner(AbstractRunner):
         if _result is not True:
             print(_result)
         return
-
-    def _save_sub_cookie(self, cookie):
-        self.config.save_sub_cookie('linemanga', cookie)
 
     def _is_login(self):
         """

@@ -155,19 +155,16 @@ class AbstractRunner(ABC):
         # print(f'{class_list}')
         return class_list
 
-    def _get_cookie(self, host_key):
+    def _get_cookie(self, type_, host_key):
         if self.sub_config.cookie:
             # TODO check expiry automatically
             return self.sub_config.cookie
         elif self.config.chrome_cookie_db:
             cookie = ChromeCookie(self.config.chrome_cookie_db).get_cookie(host_key)
-            self._save_sub_cookie(cookie)
+            self.config.save_sub_cookie(type_, cookie)
             return cookie
         else:
             return None
-
-    def _save_sub_cookie(self, cookie):
-        raise Exception('not implemented yet')
 
     @staticmethod
     def _get_cookie_dict(cookies):
@@ -184,11 +181,11 @@ class AbstractRunner(ABC):
             # print(f"{i}: {cookies[i]}")
             driver.add_cookie({'name': i, 'value': cookies[i]})
 
-    def _set_cookie(self, host_key, top_url):
+    def _set_cookie(self, type_, host_key, top_url):
         """
         should be call after self.sub_config setup
         """
-        cookie = self._get_cookie(host_key)
+        cookie = self._get_cookie(type_, host_key)
         if cookie:
             self.browser.driver.get(top_url)
             self.browser.driver.delete_all_cookies()
@@ -213,7 +210,7 @@ class DirectPageRunner(AbstractRunner, ABC):
             self.sub_config.update(self.config.raw[type_])
 
         if self.config.chrome_cookie_db and host_key and top_url:
-            if self._set_cookie( host_key, top_url):
+            if self._set_cookie(type_, host_key, top_url):
                 print('cookie has set')
 
         print('Loading page of inputted url (%s)' % self.url)
