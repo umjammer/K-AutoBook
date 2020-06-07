@@ -130,6 +130,10 @@ class AbstractManager(ABC):
     def _is_config_jpeg(self):
         return self.config is not None and self.config.image_format == ImageFormat.JPEG
 
+    def set_attribute(self, element, name, value):
+        self.browser.driver.execute_script("arguments[0].setAttribute(arguments[1], arguments[2]);",
+                                           element, name, value)
+
     def _sleep(self, sec=None):
         time.sleep(self._sleep_time if not sec else sec)
 

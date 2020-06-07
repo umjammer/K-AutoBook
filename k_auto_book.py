@@ -31,6 +31,8 @@ def _initialize_browser(config):
         chrome_options.add_argument('device-scale-factor=1')
         chrome_options.add_argument('force-device-scale-factor=1')
         chrome_options.add_argument('disable-gpu=1')
+        chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
+        chrome_options.add_experimental_option('useAutomationExtension', False)
 
         _browser = Browser(
             config.driver, headless=config.headless, user_agent=config.user_agent, service_log_path=log_name,

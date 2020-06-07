@@ -5,6 +5,7 @@ ebookjapanの操作を行うためのクラスモジュール
 
 import base64
 import io
+import re
 import time
 from PIL import Image
 from retry import retry
@@ -41,6 +42,41 @@ class Manager(AbstractManager):
 
         self._set_bound_of_side(None)
 
+    def _fix_window_size(self):
+        canvas = self.browser.find_by_css('canvas').first._element
+
+        w = 480
+        h = 640
+
+        self.browser.driver.set_window_size(w, h)
+        self._sleep(1)
+
+        self.set_attribute(canvas, 'style', f'width: {w}px; height: {h}px;')
+        self._sleep(1)
+
+        height = int(canvas.get_attribute('height'))
+        print(f'height: {height}')
+
+        self.browser.driver.set_window_size(w, height)
+        self._sleep(1)
+
+        style = canvas.get_attribute('style')
+        style = re.sub(r'height:\s+\d+px;$', f'height: {height}px;', style)
+        self.set_attribute(canvas, 'style', style)
+        print(f'style: {style}')
+        self._sleep()
+
+        width = int(canvas.get_attribute('width'))
+        print(f'width: {width}')
+
+        self.browser.driver.set_window_size(width, height)
+        print(f'window: {width}x{height}')
+        self._sleep(1)
+
+        print(f"canvas: {canvas.get_attribute('width')}x{canvas.get_attribute('height')}")
+        style = canvas.get_attribute('style')
+        print(f'style: {style}')
+
     def start(self, url=None):
         """
         ページの自動スクリーンショットを開始する
@@ -50,19 +86,8 @@ class Manager(AbstractManager):
 
         # resize by option
         self._sleep(2)
-        self.browser.driver.set_window_size(1300, 1800)
-        self._sleep(2)
-        _canvas = self.browser.find_by_css('canvas').first._element
-        _height = int(_canvas.get_attribute('height'))
-        print(f'height: {_height}')
-        self.browser.driver.set_window_size(200, 320)
-        self._sleep(2)
-        _canvas = self.browser.find_by_css('canvas').first._element
-        _width = int(_canvas.get_attribute('width'))
-        print(f'width: {_width}')
-        self.browser.driver.set_window_size(_width, _height)
-        self._sleep()
-        print(f'{_width}x{_height}')
+
+        self._fix_window_size()
 
         _total = self._get_total_page()
         if _total is None:
@@ -92,6 +117,10 @@ class Manager(AbstractManager):
 
             self._next()
             self._sleep()
+
+            if _count == 0:
+                # different size from cover
+                self._fix_window_size()
 
         return True
 
