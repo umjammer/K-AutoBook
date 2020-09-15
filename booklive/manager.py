@@ -56,12 +56,12 @@ class Manager(AbstractManager):
             # print(f'images: {len(_images)}')
             _hb = _images[-1].size[1]
             _w = _images[0].size[0]
-            _h = sum(self._get_height(_image.size[1], _hb) for _image in _images)
+            _h = sum(self._get_height(_image.size[1], _hb, _image == _images[-1]) for _image in _images)
             _dest = Image.new('RGB', (_w, _h))
             _hh = 0
             for _image in _images:
                 _dest.paste(_image, (0, _hh, _w, _hh + _image.size[1]))
-                _hh += self._get_height(_image.size[1], _hb)
+                _hh += self._get_height(_image.size[1], _hb, _image == _images[-1])
             self._save_image(_count, _dest)
 
             self.pbar.update(1)
@@ -72,12 +72,14 @@ class Manager(AbstractManager):
         return True
 
     @staticmethod
-    def _get_height(height, base):
+    def _get_height(height, base, last):
         """
         TODO without any reasons
         """
-        if base == 534:  # 1600
-            if height != base:
+        if 534 <= base <= 536:  # 1600
+            if last:
+                base = 534
+            else:
                 base = 533
         elif base == 400:  # 1200
             pass
