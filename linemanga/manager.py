@@ -40,7 +40,7 @@ class Manager(AbstractManager):
 
         _total = self._get_total_page()
         if _total is None:
-            return '全ページ数の取得に失敗しました'
+            return '全ページ数の取得に失敗しました (or cookie might be expired, remove cookie from config.json)'
 
         self.current_page_element = self._get_current_page_element()
         if self.current_page_element is None:
