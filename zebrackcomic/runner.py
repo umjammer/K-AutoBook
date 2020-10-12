@@ -57,6 +57,7 @@ class Runner(AbstractRunner):
         """
         time.sleep(3)
 
+        # skip dialog
         clazz = "div.karte-c"
         self.browser.driver.execute_script(f'document.querySelector("{clazz}").style.display = "none";')
 
@@ -72,7 +73,15 @@ class Runner(AbstractRunner):
                 _elements.click()
                 return True
             except Exception:
-                return True
+                # skip dialog
+                clazz = "div[class*='Modal_modalBase']"
+                self.browser.driver.execute_script(f'document.querySelector("{clazz}").style.display = "none";')
+
+                # 試し読み
+                _elements = self.browser.find_by_css('button[class*="MainContents_trialButton"]')
+                if len(_elements) != 0:
+                    _elements.first.click()
+                    return True
 
         return False
 
