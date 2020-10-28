@@ -66,7 +66,7 @@ class Manager(AbstractManager):
         """
         for _ in range(Manager.MAX_LOADING_TIME):
             try:
-                _element = self.browser.driver.find_element_by_xpath("//*[@id='root']/*/div/div[3]/p")
+                _element = self.browser.driver.find_element_by_xpath("//*[@id='root']/section/div/div/div[3]/p")
                 # print(_element.get_attribute('innerHTML'))
                 if re.match('^\\d+ / \\d+$', _element.get_attribute('innerHTML')):
                     return int(_element.get_attribute('innerHTML').split('/')[1].strip())
@@ -80,7 +80,7 @@ class Manager(AbstractManager):
         @return ページ数が表示されているエレメントがある場合はそのエレメントを、ない場合は None を返す
         """
         try:
-            _element = self.browser.driver.find_element_by_xpath("//*[@id='root']/*/div/div[3]/p")
+            _element = self.browser.driver.find_element_by_xpath("//*[@id='root']/section/div/div/div[3]/p")
             return _element
         except:
             return None

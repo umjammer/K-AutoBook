@@ -20,7 +20,7 @@ class Runner(AbstractRunner):
     サポートするドメイン
     """
 
-    patterns = ['title\\/(\\d+)\\/volume\\/(\\d+)']
+    patterns = ['title\\/(\\d+)\\/volume\\/(\\d+)\\/*$']
     """
     サポートする zebrackcomic のパスの正規表現のパターンのリスト
     """
