@@ -14,18 +14,5 @@ class Runner(DirectPageRunner):
     https://www.cmoa.jp/bib/speedreader/speed.html?cid=0000101745_jp_0002&u0=1&u1=0&rurl=https%3A%2F%2Fwww.cmoa.jp%2Ftitle%2F101745%2Fvol%2F2%2F
     """
 
-    domain_pattern = 'www\\.cmoa\\.jp'
-    """
-    サポートするドメイン
-    """
-
-    patterns = ['bib\\/speedreader\\/speed.html\\?cid=(\\d{10}_[a-z]{2}_\\d{4})']
-    """
-    サポートする comic-cmoa のパスの正規表現のパターンのリスト
-    """
-
-    def run(self):
-        """
-        comic-cmoa の実行
-        """
-        self._run('cmoa', Manager, SubConfigWithCookie, 'cmoa.jp', 'https://www.cmoa.jp/')
+    def __init__(self, type_, browser, config):
+        super().__init__(type_, browser, config, SubConfigWithCookie, Manager)

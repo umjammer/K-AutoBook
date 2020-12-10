@@ -14,24 +14,13 @@ class Runner(AbstractRunner):
     https://bookpass.auone.jp/pack/detail/?iid=BT000069318400100101&cs=top_freecomics_reco_670&pos=2&tab=1&ajb=3
     """
 
-    domain_pattern = 'bookpass\\.auone\\.jp'
-    """
-    サポートするドメイン
-    """
-
-    patterns = ['pack\\/detail\\/\\?iid=([A-Z]{2}\\d+)']
-    """
-    サポートする bookpass のパスの正規表現のパターンのリスト
-    """
+    def __init__(self, type_, browser, config):
+        super().__init__(type_, browser, config, BasicSubConfig)
 
     def run(self):
         """
         bookpass の実行
         """
-        self.sub_config = BasicSubConfig()
-        if 'bookpass' in self.config.raw:
-            self.sub_config.update(self.config.raw['bookpass'])
-
         print('Loading page of inputted url (%s)' % self.url)
         self.browser.visit(self.url)
 
@@ -41,21 +30,21 @@ class Runner(AbstractRunner):
             print('ページの取得に失敗しました')
             return
 
-        _destination = self.get_output_dir()
-        print(f'Output Path : {_destination}')
+        destination = self.get_output_dir()
+        print(f'Output Path : {destination}')
 
-        _manager = Manager(self.browser, self.sub_config, _destination)
-        _result = _manager.start()
-        if _result is not True:
-            print(_result)
+        manager = Manager(self.browser, self.sub_config, destination)
+        result = manager.start()
+        if result is not True:
+            print(result)
         return
 
     def _move_main_page(self):
         """
         実際の本のページに移動する
         """
-        _elements = self.browser.find_by_css('a.button.view_button')
-        if len(_elements) != 0 and '読む' in _elements.first.html:
-            _elements.first.click()
+        elements = self.browser.find_by_css('a.button.view_button')
+        if len(elements) != 0 and '読む' in elements.first.html:
+            elements.first.click()
             return True
         return False

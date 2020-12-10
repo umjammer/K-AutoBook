@@ -15,29 +15,18 @@ class Runner(AbstractRunner):
     https://zebrack-comic.com/title/37/volume/1498/viewer
     """
 
-    domain_pattern = 'zebrack-comic\\.com'
-    """
-    サポートするドメイン
-    """
-
-    patterns = ['title\\/(\\d+)\\/volume\\/(\\d+)\\/*$']
-    """
-    サポートする zebrackcomic のパスの正規表現のパターンのリスト
-    """
+    def __init__(self, type_, browser, config):
+        super().__init__(type_, browser, config, BasicSubConfig)
 
     def run(self):
         """
         zebrack-comic の実行
         """
-        self.sub_config = BasicSubConfig()
-        if 'zebrackcomic' in self.config.raw:
-            self.sub_config.update(self.config.raw['zebrackcomic'])
-
         print('Loading page of inputted url (%s)' % self.url)
         self.browser.visit(self.url)
 
-        _destination = self.get_output_dir()
-        print(f'Output Path : {_destination}')
+        destination = self.get_output_dir()
+        print(f'Output Path : {destination}')
 
         if self._move_main_page():
             print('Open main page')
@@ -45,11 +34,10 @@ class Runner(AbstractRunner):
             print('ページの取得に失敗しました')
             return
 
-        _manager = Manager(
-            self.browser, self.sub_config, _destination)
-        _result = _manager.start()
-        if _result is not True:
-            print(_result)
+        manager = Manager(self.browser, self.sub_config, destination)
+        result = manager.start()
+        if result is not True:
+            print(result)
 
     def _move_main_page(self):
         """
@@ -61,16 +49,16 @@ class Runner(AbstractRunner):
         clazz = "div.karte-c"
         self.browser.driver.execute_script(f'document.querySelector("{clazz}").style.display = "none";')
 
-        _elements = self.browser.find_by_css('button.undefined')
-        if len(_elements) != 0:
-            _elements.first.click()
+        elements = self.browser.find_by_css('button.undefined')
+        if len(elements) != 0:
+            elements.first.click()
             time.sleep(.5)
 
             # skip dialog 2
             time.sleep(.5)
             try:
-                _elements = self.browser.driver.find_element_by_xpath("//*[text()='無料で読む']")
-                _elements.click()
+                elements = self.browser.driver.find_element_by_xpath("//*[text()='無料で読む']")
+                elements.click()
                 return True
             except Exception:
                 # skip dialog
@@ -78,12 +66,9 @@ class Runner(AbstractRunner):
                 self.browser.driver.execute_script(f'document.querySelector("{clazz}").style.display = "none";')
 
                 # 試し読み
-                _elements = self.browser.find_by_css('button[class*="MainContents_trialButton"]')
-                if len(_elements) != 0:
-                    _elements.first.click()
+                elements = self.browser.find_by_css('button[class*="MainContents_trialButton"]')
+                if len(elements) != 0:
+                    elements.first.click()
                     return True
 
         return False
-
-    def need_reset(self):
-        return True

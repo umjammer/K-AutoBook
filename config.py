@@ -211,6 +211,16 @@ class BasicSubConfig(AbstractConfig):
         """
         super().__init__()
 
+        self.domain = None
+        """
+        サポートするドメイン
+        """
+
+        self.patterns = None
+        """
+        サポートするパスの正規表現のパターンのリスト
+        """
+
         self.username = None
         """
         ID
@@ -227,6 +237,10 @@ class BasicSubConfig(AbstractConfig):
         """
         super().update(data)
 
+        if 'domain' in data:
+            self.domain = data['domain']
+        if 'patterns' in data:
+            self.patterns = data['patterns']
         if 'username' in data:
             self.username = data['username']
         if 'password' in data:
@@ -241,6 +255,8 @@ class SubConfigWithCookie(BasicSubConfig):
     def __init__(self):
         super().__init__()
 
+        self.host_key = None
+        self.top_url = None
         self.cookie = None
         """
         Cookie
@@ -253,6 +269,10 @@ class SubConfigWithCookie(BasicSubConfig):
         """
         super().update(data)
 
+        if 'host_key' in data:
+            self.host_key = data['host_key']
+        if 'top_url' in data:
+            self.top_url = data['top_url']
         if 'cookie' in data:
             self.cookie = data['cookie']
 

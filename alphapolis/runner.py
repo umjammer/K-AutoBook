@@ -13,24 +13,10 @@ class Runner(AbstractRunner):
     アルファポリスの実行クラス
     """
 
-    domain_pattern = 'www\\.alphapolis\\.co\\.jp'
-    """
-    サポートするドメイン
-    """
-
-    patterns = [
-        'manga\\/official\\/(\\d+)',
-        'manga\\/viewManga\\/(\\?.*no=)?(\\d+)',
-        'manga\\/official\\/(\\d+)\\/(\\d+)'
-    ]
-    """
-    サポートするアルファポリスのパスの正規表現のパターンのリスト
-    """
-
     def run(self):
         """
         アルファポリスの実行
         """
-        _destination = self.get_output_dir()
-        _manager = Manager(self.browser, None, _destination)
-        _manager.start(self.url)
+        destination = self.get_output_dir()
+        manager = Manager(self.browser, None, destination)
+        manager.start(self.url)

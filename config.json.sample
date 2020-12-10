@@ -4,7 +4,46 @@
     "headless":true,
     "log_directory": "logs",
     "base_directory": "data",
+    "alphapolis": {
+        "domain": "www\\.alphapolis\\.co\\.jp",
+        "patterns": [
+            "manga\\/official\\/(\\d+)",
+            "manga\\/viewManga\\/(\\?.*no=)?(\\d+)",
+            "manga\\/official\\/(\\d+)\\/(\\d+)"
+        ]
+    },
+    "booklive": {
+        "domain": "booklive\\.jp",
+        "patterns": ["bviewer\\/s\\/\\?cid=(\\d{6,8}_\\d{3})"]
+    },
+    "bookpass": {
+        "domain": "bookpass\\.auone\\.jp",
+        "patterns": ["pack\\/detail\\/\\?iid=([A-Z]{2}\\d+)"]
+    },
+    "bookwalker": {
+        "domain": "viewer\\.bookwalker\\.jp",
+        "patterns": ["browserWebApi\\/\\d+\\/view\\?cid=([0-9a-f-]+)"]
+    },
+    "cmoa": {
+        "domain": "www\\.cmoa\\.jp",
+        "patterns": ["bib\\/speedreader\\/speed.html\\?cid=(\\d{10}_[a-z]{2}_\\d{4})"],
+        "cookie": "how to get cookie: see 'https://github.com/xuzhengyi1995/Bookwalker_Downloader' (!!! caution: target site is 'https://manga.line.me/' !!!)"
+    },
+    "comicaction": {
+        "domain": "comic-action\\.com",
+        "patterns": ["volume\\/(\\d+)", "episode\\/(\\d+)"]
+    },
+    "comicdays": {
+        "domain": "comic-days\\.com",
+        "patterns": ["volume\\/(\\d+)", "episode\\/(\\d+)"]
+    },
+    "comicwalker": {
+        "domain": "comic-walker\\.com",
+        "patterns": ["viewer\\/.*&cid=(KDCW_[A-Z]{2}[0-9]{14}_[0-9]{2})"]
+    },
     "ebookjapan": {
+        "domain": "ebookjapan\\.yahoo\\.co\\.jp",
+        "patterns": ["books\\/(\\d+)\\/([A-Z]{1}\\d+)"],
         "needs_login": false,
         "username": "",
         "password": "",
@@ -14,7 +53,21 @@
         "blank_check_excludes": "(1, -1, 0)",
         "blank_check_giveup": 5
     },
+    "ganganonline": {
+        "domain": "viewer\\.ganganonline\\.com",
+        "patterns": ["manga\\/\\?chapterId=(\\d+)"]
+    },
+    "jumpplus": {
+        "domain": "shonenjumpplus\\.com",
+        "patterns": ["volume\\/(\\d+)", "episode\\/(\\d+)"]
+    },
+    "kuragebunch": {
+        "domain": "kuragebunch\\.com",
+        "patterns": ["volume\\/(\\d+)", "episode\\/(\\d+)"]
+    },
     "linemanga": {
+        "domain": "manga\\.line\\.me",
+        "patterns": ["book\\/viewer\\?id=([0-9a-zA-Z-]+)"],
         "needs_login": false,
         "username": "not implemented yet",
         "password": "not implemented yet",
@@ -22,10 +75,24 @@
         "sleep_time": 0.5,
         "cookie": "how to get cookie: see 'https://github.com/xuzhengyi1995/Bookwalker_Downloader' (!!! caution: target site is 'https://manga.line.me/' !!!)"
     },
-    "zebrackcomic": {
+    "magazinepocket": {
+        "domain": "pocket\\.shonenmagazine\\.com",
+        "patterns": ["volume\\/(\\d+)", "episode\\/(\\d+)"]
+    },
+    "mangacross": {
+        "domain": "mangacross\\.jp",
+        "patterns": ["comics\\/(\\w+)\\/([0-9]+)"],
         "needs_login": false,
-        "username": "",
-        "password": "",
+        "cookie": "how to get cookie: see 'https://github.com/xuzhengyi1995/Bookwalker_Downloader' (!!! caution: target site is 'https://manga.line.me/' !!!)"
+    },
+    "webace": {
+        "domain": "web-ace\\.jp",
+        "patterns": ["youngaceup\\/contents\\/(\\d+)\\/episode\\/(\\d+)"]
+    },
+    "zebrackcomic": {
+        "domain": "zebrack-comic(\\.shueisha\\.co\\.jp|\\.com)",
+        "patterns": ["title\\/(\\d+)\\/volume\\/(\\d+)\\/*$"],
+        "needs_login": false,
         "image_format": "JPEG",
         "sleep_time": 0.6
     }

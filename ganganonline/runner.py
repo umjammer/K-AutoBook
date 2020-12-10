@@ -13,18 +13,5 @@ class Runner(DirectPageRunner):
     https://viewer.ganganonline.com/manga/?chapterId=15502
     """
 
-    domain_pattern = 'viewer\\.ganganonline\\.com'
-    """
-    サポートするドメイン
-    """
-
-    patterns = ['manga\\/\\?chapterId=(\\d+)']
-    """
-    サポートする gangan-online のパスの正規表現のパターンのリスト
-    """
-
-    def run(self):
-        """
-        gangan-online の実行
-        """
-        self._run('ganganonline', Manager)
+    def __init__(self, type_, browser, config):
+        super().__init__(type_, browser, config, manager_class=Manager)

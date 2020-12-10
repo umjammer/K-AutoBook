@@ -15,18 +15,5 @@ class Runner(DirectPageRunner):
     詳細ページ https://bookwalker.jp/{cid}/ の赤いボタン "今すぐ読む (無料)" のリンクをコピー
     """
 
-    domain_pattern = 'viewer\\.bookwalker\\.jp'
-    """
-    サポートするドメイン
-    """
-
-    patterns = ['browserWebApi\\/\\d+\\/view\\?cid=([0-9a-f-]+)']
-    """
-    サポートする bookwalker のパスの正規表現のパターンのリスト
-    """
-
-    def run(self):
-        """
-        bookwalker の実行
-        """
-        self._run('bookwalker', Manager)
+    def __init__(self, type_, browser, config):
+        super().__init__(type_, browser, config, manager_class=Manager)

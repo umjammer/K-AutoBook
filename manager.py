@@ -71,22 +71,22 @@ class AbstractManager(ABC):
             self.directory = './'
             print('Output to current directory')
             return
-        _base_path = directory.rstrip('/')
-        if _base_path == '':
-            _base_path = '/'
-        elif not path.exists(_base_path):
-            self.directory = _base_path + '/'
+        base_path = directory.rstrip('/')
+        if base_path == '':
+            base_path = '/'
+        elif not path.exists(base_path):
+            self.directory = base_path + '/'
             return
         else:
-            if not len(listdir(_base_path)):
-                print(f"Output directory {_base_path} exists but empty")
-                self.directory = _base_path + '/'
+            if not len(listdir(base_path)):
+                print(f"Output directory {base_path} exists but empty")
+                self.directory = base_path + '/'
                 return
-            _base_path = _base_path + '-'
+            base_path = base_path + '-'
         i = 1
-        while path.exists(_base_path + str(i)):
+        while path.exists(base_path + str(i)):
             i = i + 1
-        self.directory = _base_path + str(i) + '/'
+        self.directory = base_path + str(i) + '/'
         print("Change output directory to '%s' because '%s' already exists"
               % (self.directory, directory))
 
@@ -105,27 +105,27 @@ class AbstractManager(ABC):
         # print(f'total: {_total}')
 
     def _get_image_by_url(self, url):
-        _image = Image.open(io.BytesIO(get_file_content_chrome(self.browser.driver, url)))
+        image = Image.open(io.BytesIO(get_file_content_chrome(self.browser.driver, url)))
         if self._is_config_jpeg():
-            _image = _image.convert('RGB')
-        return _image
+            image = image.convert('RGB')
+        return image
 
     def _save_image_of_web_element(self, count, element):
-        _base64_image = self.browser.driver.execute_script(
+        base64_image = self.browser.driver.execute_script(
             "return arguments[0].toDataURL('image/%s').substring(22);" % self._format, element)
-        _name = '%s%s%03d%s' % (self.directory, self.prefix, count, self._extension)
-        with open(_name, 'wb') as f:
-            f.write(base64.b64decode(_base64_image))
+        name = '%s%s%03d%s' % (self.directory, self.prefix, count, self._extension)
+        with open(name, 'wb') as f:
+            f.write(base64.b64decode(base64_image))
 
     def _save_image_of_bytes(self, count, bytes_):
-        _image = Image.open(io.BytesIO(bytes_))
+        image = Image.open(io.BytesIO(bytes_))
         if self._is_config_jpeg():
-            _image = _image.convert('RGB')
-        self._save_image(count, _image)
+            image = image.convert('RGB')
+        self._save_image(count, image)
 
     def _save_image(self, count, image):
-        _name = '%s%s%03d%s' % (self.directory, self.prefix, count, self._extension)
-        image.save(_name, self._format.upper())
+        name = '%s%s%03d%s' % (self.directory, self.prefix, count, self._extension)
+        image.save(name, self._format.upper())
 
     def _is_config_jpeg(self):
         return self.config is not None and self.config.image_format == ImageFormat.JPEG
@@ -277,15 +277,15 @@ class CoreViewManager(AbstractManager):
         """
         self._wait()
 
-        _script = self.browser.find_by_id('episode-json').first._element
-        _json = json.loads(_script.get_attribute('data-value'))
-        self._image_type = _json['readableProduct']['pageStructure']['choJuGiga']
-        _pages = [x for x in _json['readableProduct']['pageStructure']['pages'] if x['type'] == 'main']
-        self._set_total(len(_pages))
+        script = self.browser.find_by_id('episode-json').first._element
+        json_ = json.loads(script.get_attribute('data-value'))
+        self._image_type = json_['readableProduct']['pageStructure']['choJuGiga']
+        pages = [x for x in json_['readableProduct']['pageStructure']['pages'] if x['type'] == 'main']
+        self._set_total(len(pages))
 
         session = self._get_session()
 
-        for i, page in enumerate(_pages):
+        for i, page in enumerate(pages):
             self.fetch_page(session, page['src'], i)
             self.pbar.update(1)
             self._sleep()
@@ -294,9 +294,9 @@ class CoreViewManager(AbstractManager):
 
     def fetch_page(self, session, url, count):
         if self._image_type == 'usagi':
-            _image = Image.open(BytesIO(session.get(url).content))
+            image = Image.open(BytesIO(session.get(url).content))
         else:
-            _image = decrypt_coreview_image(Image.open(BytesIO(session.get(url).content)))
+            image = decrypt_coreview_image(Image.open(BytesIO(session.get(url).content)))
         if self._is_config_jpeg():
-            _image = _image.convert('RGB')
-        self._save_image(count, _image)
+            image = image.convert('RGB')
+        self._save_image(count, image)

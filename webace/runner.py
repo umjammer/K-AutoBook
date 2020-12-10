@@ -13,21 +13,5 @@ class Runner(DirectPageRunner):
     https://web-ace.jp/youngaceup/contents/1000053/episode/1092/
     """
 
-    domain_pattern = 'web-ace\\.jp'
-    """
-    サポートするドメイン
-    """
-
-    patterns = ['youngaceup\\/contents\\/(\\d+)\\/episode\\/(\\d+)']
-    """
-    サポートする web-ace のパスの正規表現のパターンのリスト
-    """
-
-    def run(self):
-        """
-        web-ace の実行
-        """
-        self._run('webace', Manager)
-
-    def need_reset(self):
-        return True
+    def __init__(self, type_, browser, config):
+        super().__init__(type_, browser, config, manager_class=Manager)

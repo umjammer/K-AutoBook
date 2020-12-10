@@ -19,39 +19,28 @@ class Runner(AbstractRunner):
     https://ebookjapan.yahoo.co.jp/books/145222/A000100547
     """
 
-    domain_pattern = 'ebookjapan\\.yahoo\\.co\\.jp'
-    """
-    サポートするドメイン
-    """
-
-    patterns = ['books\\/(\\d+)\\/([A-Z]{1}\\d+)']
-    """
-    サポートする ebookjapan のパスの正規表現のパターンのリスト
-    """
-
     is_login = False
     """
     ログイン状態
     """
 
+    def __init__(self, type_, browser, config):
+        super().__init__(type_, browser, config, SubConfig)
+
     def run(self):
         """
         ebookjapan の実行
         """
-        self.sub_config = SubConfig()
-        if 'ebookjapan' in self.config.raw:
-            self.sub_config.update(self.config.raw['ebookjapan'])
-
         try:
             if (self.sub_config.needs_login and
                     not self._is_login() and not self._login()):
                 return
-        except Exception as err:
-            _filename = 'login_error_%s.png' % datetime.now().strftime('%s')
+        except Exception as e:
+            filename = 'login_error_%s.png' % datetime.now().strftime('%s')
             self.browser.driver.save_screenshot(
-                path.join(self.config.log_directory, _filename))
+                path.join(self.config.log_directory, filename))
             print('ログイン時にエラーが発生しました: %s' %
-                  err.with_traceback(sys.exc_info()[2]))
+                  e.with_traceback(sys.exc_info()[2]))
             return
         print('Loading page of inputted url (%s)' % self.url)
         self.browser.visit(self.url)
@@ -64,14 +53,14 @@ class Runner(AbstractRunner):
             print('ページの取得に失敗しました')
             return
 
-        _destination = self.get_output_dir()
-        print(f'Output Path : {_destination}')
+        destination = self.get_output_dir()
+        print(f'Output Path : {destination}')
 
-        _manager = Manager(
-            self.browser, self.sub_config, _destination)
-        _result = _manager.start()
-        if _result is not True:
-            print(_result)
+        manager = Manager(
+            self.browser, self.sub_config, destination)
+        result = manager.start()
+        if result is not True:
+            print(result)
         return
 
     def _is_login(self):
@@ -108,9 +97,9 @@ class Runner(AbstractRunner):
         """
         実際の本のページに移動する
         """
-        _elements = self.browser.find_by_css('.btn.btn--primary.btn--read')
-        if len(_elements) != 0 and '読む' in _elements.first.text:
-            _elements.first.click()
+        elements = self.browser.find_by_css('.btn.btn--primary.btn--read')
+        if len(elements) != 0 and '読む' in elements.first.text:
+            elements.first.click()
             return True
         return False
 
@@ -118,8 +107,8 @@ class Runner(AbstractRunner):
         """
         実際の本の試し読みページに移動する
         """
-        _elements = self.browser.find_by_css('.book-main__purchase > a.btn')
-        if len(_elements) != 0 and '試し読み' in _elements.first.text:
-            _elements.first.click()
+        elements = self.browser.find_by_css('.book-main__purchase > a.btn')
+        if len(elements) != 0 and '試し読み' in elements.first.text:
+            elements.first.click()
             return True
         return False

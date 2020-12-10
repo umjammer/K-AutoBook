@@ -18,16 +18,6 @@ class Runner(AbstractRunner):
     https://manga.line.me/book/viewer?id=92dc0b4e-c5d4-4518-9fba-d78fb1e6b0f0
     """
 
-    domain_pattern = 'manga\\.line\\.me'
-    """
-    サポートするドメイン
-    """
-
-    patterns = ['book\\/viewer\\?id=([0-9a-zA-Z-]+)']
-    """
-    サポートする line-manga のパスの正規表現のパターンのリスト
-    """
-
     is_login = False
     """
     ログイン状態
@@ -37,16 +27,15 @@ class Runner(AbstractRunner):
     """
     """
 
+    def __init__(self, type_, browser, config):
+        super().__init__(type_, browser, config, SubConfigWithCookie)
+
     def run(self):
         """
         line-manga の実行
         """
-        self.sub_config = SubConfigWithCookie()
-        if 'linemanga' in self.config.raw:
-            self.sub_config.update(self.config.raw['linemanga'])
-
         try:
-            if self._set_cookie('linemanga', 'manga.line.me', 'https://manga.line.me/'):
+            if self._set_cookie():
                 self.browser.driver.get('https://manga.line.me/store/')
                 time.sleep(1)
             else:
@@ -54,23 +43,23 @@ class Runner(AbstractRunner):
                         not self._is_login() and not self._login()):
                     return
         except Exception as err:
-            _filename = 'login_error_%s.png' % datetime.now().strftime('%s')
+            filename = 'login_error_%s.png' % datetime.now().strftime('%s')
             self.browser.driver.save_screenshot(
-                path.join(self.config.log_directory, _filename))
+                path.join(self.config.log_directory, filename))
             raise err
         print('Loading page of inputted url (%s)' % self.url)
         self.browser.visit(self.url)
 
         print('Open main page')
 
-        _destination = self.get_output_dir()
-        print(f'Output Path : {_destination}')
+        destination = self.get_output_dir()
+        print(f'Output Path : {destination}')
 
-        _manager = Manager(
-            self.browser, self.sub_config, _destination)
-        _result = _manager.start()
-        if _result is not True:
-            print(_result)
+        manager = Manager(
+            self.browser, self.sub_config, destination)
+        result = manager.start()
+        if result is not True:
+            print(result)
         return
 
     def _is_login(self):

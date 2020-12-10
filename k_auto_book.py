@@ -34,13 +34,13 @@ def _initialize_browser(config):
         chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
         chrome_options.add_experimental_option('useAutomationExtension', False)
 
-        _browser = Browser(
+        browser = Browser(
             config.driver, headless=config.headless, user_agent=config.user_agent, service_log_path=log_name,
             options=chrome_options)
     else:
-        _browser = Browser(
+        browser = Browser(
             config.driver, headless=config.headless, user_agent=config.user_agent, service_log_path=log_name)
-    return _browser
+    return browser
 
 
 def _reset_browser(browser, config):
@@ -58,35 +58,36 @@ def _main():
     $ python k_auto_book.py '?python script'
     """
 
-    _config = Config()
-    _make_directory(_config.log_directory)
-    _make_directory(_config.base_directory)
-    _browser = _initialize_browser(_config)
+    config = Config()
+    _make_directory(config.log_directory)
+    _make_directory(config.base_directory)
+    browser = _initialize_browser(config)
 
-    _stripper = re.compile(r'^\s+')
+    stripper = re.compile(r'^\s+')
 
-    _plugins = AbstractRunner.get_plugins()
-    # print(f'{_plugins}')
+    plugin_classes = AbstractRunner.get_plugins()
+    # print(f'{plugin_classes}')
+    plugins = [p(m, browser, config) for m, p in plugin_classes]
 
-    _input_data = None
+    input_data = None
 
     if len(sys.argv) > 1:
-        _input_data = str.join(' ', sys.argv[1:])
+        input_data = str.join(' ', sys.argv[1:])
 
     while True:
-        if not _input_data:
+        if not input_data:
             try:
-                _input_data = _stripper.sub('', input('Input URL > '))
+                input_data = stripper.sub('', input('Input URL > '))
             except EOFError:
                 print("\nBye.")
                 break
 
-        if _input_data == '':
+        if input_data == '':
             continue
-        elif _input_data == 'exit':
+        elif input_data == 'exit':
             print('Bye.')
             break
-        elif _input_data[0:1] == '?':
+        elif input_data[0:1] == '?':
             """
             you can script as python syntax if input strings starts with '?'
             for example:
@@ -95,29 +96,28 @@ def _main():
             
             this creates urls of range 1124 ~ 1152. and downloads the contents of the url automatically.
             """
-            _urls = eval(_input_data[1:])
-            _options = None
+            urls = eval(input_data[1:])
+            options = None
         else:
-            _inputs_data = _input_data.split(' ', 1)
-            _urls = [_inputs_data[0]]
-            _options = _inputs_data[1] if 1 < len(_inputs_data) else None
+            inputs_data = input_data.split(' ', 1)
+            urls = [inputs_data[0]]
+            options = inputs_data[1] if 1 < len(inputs_data) else None
 
-        _input_data = None
+        input_data = None
 
-        for _url in _urls:
-            _done = False
-            print(f'url: {_url}')
-            for _plugin in _plugins:
-                # print(_plugin)
-                if _plugin.check(_url):
-                    _runner = _plugin()
-                    _runner.init(_browser, _url, _config, _options)
-                    _runner.run()
-                    if _runner.need_reset():
-                        _browser = _reset_browser(_browser, _config)
+        for url in urls:
+            done = False
+            print(f'url: {url}')
+            for plugin in plugins:
+                # print(plugin)
+                if plugin.check(url):
+                    plugin.init(url, options)
+                    plugin.run()
+                    browser = _reset_browser(browser, config)
+                    plugin.reset(browser)
                     print('', flush=True)
-                    _done = True
-            if not _done:
+                    done = True
+            if not done:
                 print('URL is not supported')
 
 
