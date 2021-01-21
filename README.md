@@ -30,9 +30,9 @@ Downloadable sites available,
 
 ## Requirement
 
-* `Python` Python 3 (tested with 3.7.6)
-* `pip` (tested with 20.1.1)
-* [`ChromeDriver`](https://chromedriver.chromium.org/downloads) (tested with 80.0.3987.106)
+* `Python` Python 3 (tested with 3.9.1)
+* `pip` (tested with 20.3.3)
+* [`ChromeDriver`](https://chromedriver.chromium.org/downloads) (tested with 87.0.4280.88)
 
 ## Install
 
