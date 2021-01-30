@@ -95,5 +95,9 @@
         "needs_login": false,
         "image_format": "JPEG",
         "sleep_time": 0.6
+    },
+    "piccoma": {
+        "domain": "piccoma\\.com",
+        "patterns": ["web\\/viewer\\/(\\d+)\\/(\\d+)"]
     }
 }
