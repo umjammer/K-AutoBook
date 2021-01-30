@@ -30,7 +30,9 @@ def _initialize_browser(config):
         chrome_options.add_argument('high-dpi-support=1')
         chrome_options.add_argument('device-scale-factor=1')
         chrome_options.add_argument('force-device-scale-factor=1')
-        chrome_options.add_argument('disable-gpu=1')
+        chrome_options.add_argument('disable-gpu')
+        # https://stackoverflow.com/a/59111770
+        chrome_options.add_argument('disable-web-security')
         chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
         chrome_options.add_experimental_option('useAutomationExtension', False)
 
