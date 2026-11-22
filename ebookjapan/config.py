@@ -1,6 +1,6 @@
 # --- coding: utf-8 ---
 """
-ebookjapanの設定モジュール
+ebookjapan configuration
 """
 
 from config import SubConfigWithCookie
@@ -8,12 +8,12 @@ from config import SubConfigWithCookie
 
 class SubConfig(SubConfigWithCookie):
     """
-    設定情報を管理するためのクラス
+    configuration information
     """
 
     def __init__(self):
         """
-        設定情報を管理するためのコンストラクタ
+        constructs configuration
         """
         super().__init__()
 
@@ -29,8 +29,8 @@ class SubConfig(SubConfigWithCookie):
 
     def update(self, data):
         """
-        設定情報を更新する
-        @param data 更新するデータ
+        updates configuration
+        @param data data for update
         """
         super().update(data)
 

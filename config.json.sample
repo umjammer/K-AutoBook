@@ -160,8 +160,8 @@
         "patterns": [
             "meguro\\/\\w+\\/libcontentsinfo\\/\\?conid=(\\d+)"
         ],
-        "$host_key": ".d-library.jp",
-        "top_url": "https://www.d-library.jp/meguro"
+        "username": "your_yahoo_id",
+        "password": "your_yahoo_password"
     },
     "amazon": {
         "driver": "chrome_headless",

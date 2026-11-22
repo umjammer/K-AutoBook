@@ -16,3 +16,4 @@ profile/
 .idea/
 venv/
 .venv/
+/SESSION.md
