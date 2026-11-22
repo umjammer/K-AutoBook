@@ -184,6 +184,10 @@ class AbstractRunner(ABC):
             print('not set cookie')
             return False
 
+    def _set_attribute(self, element, att_name, att_value):
+        # TODO duplicated manager.py
+        self.driver.execute_script("arguments[0].setAttribute(arguments[1], arguments[2]);",
+                element, att_name, att_value)
 
 class DirectPageRunner(AbstractRunner, ABC):
     """
