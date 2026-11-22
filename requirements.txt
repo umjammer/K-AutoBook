@@ -7,3 +7,4 @@ Pillow==10.1.0
 selenium==4.15.1
 keyring==24.2.0
 pycryptodome==3.19.0
+pillow-avif-plugin==1.4.1

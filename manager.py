@@ -7,6 +7,7 @@ import base64
 import io
 import json
 import math
+import pillow_avif
 import requests
 import time
 from abc import ABC, abstractmethod
