@@ -3,8 +3,10 @@
 
 import os
 import re
+import subprocess
 import sys
 from os import path
+import undetected_chromedriver as uc
 from selenium import webdriver
 from selenium.webdriver import ChromeOptions
 from selenium.webdriver.chrome.service import Service
@@ -21,18 +23,32 @@ def _make_directory(directory):
             raise exception
 
 
+def _get_chrome_version_main(chrome_binary=None):
+    exe = chrome_binary or uc.find_chrome_executable()
+    if exe:
+        try:
+            out = subprocess.check_output([exe, '--version'], stderr=subprocess.STDOUT).decode()
+            m = re.search(r'(\d+)\.', out)
+            if m:
+                return int(m.group(1))
+        except Exception:
+            pass
+    return None
+
+
 def _initialize_driver(config, profile="chrome"):
     # TODO out source (best: configuration, better: class)
     log_name = path.join(config.log_directory, 'driver.log')
+    version_main = _get_chrome_version_main(config.chrome_binary)
     if profile == 'chrome':
-        chrome_options = ChromeOptions()
+        chrome_options = uc.ChromeOptions()
         if config.chrome_binary:
             print(config.chrome_binary)
             chrome_options.binary_location = config.chrome_binary
-        chrome_options.add_argument('high-dpi-support=1')
-        chrome_options.add_argument('device-scale-factor=1')
-        chrome_options.add_argument('force-device-scale-factor=1')
-        chrome_options.add_argument('disable-gpu')
+        chrome_options.add_argument('--high-dpi-support=1')
+        chrome_options.add_argument('--device-scale-factor=1')
+        chrome_options.add_argument('--force-device-scale-factor=1')
+        chrome_options.add_argument('--disable-gpu')
 
         if config.headless:
             print(f"headless: {config.headless}")
@@ -43,23 +59,26 @@ def _initialize_driver(config, profile="chrome"):
             print(f"use profile: {config.profile_directory}")
             chrome_options.add_argument(f'--user-data-dir={config.profile_directory}')
         if config.user_agent:
-            chrome_options.add_argument(f'user-agent={config.user_agent}')
+            chrome_options.add_argument(f'--user-agent={config.user_agent}')
         # https://stackoverflow.com/a/59111770
-        chrome_options.add_argument('disable-web-security')
-        chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
-        chrome_options.add_experimental_option('useAutomationExtension', False)
+        chrome_options.add_argument('--disable-web-security')
+        # chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
+        # chrome_options.add_experimental_option('useAutomationExtension', False)
 
-        service = Service(options=chrome_options, service_args=["--verbose", f"--log-path={log_name}"])
-        driver = webdriver.Chrome(service=service)
+        # service = Service(options=chrome_options, service_args=["--verbose", f"--log-path={log_name}"])
+        driver = uc.Chrome(options=chrome_options, service_args=["--verbose", f"--log-path={log_name}"],
+                           version_main=version_main)
+        if config.headless:
+            driver.set_window_size(960, 1222)
     elif profile == 'chrome_headless':
-        chrome_options = ChromeOptions()
+        chrome_options = uc.ChromeOptions()
         if config.chrome_binary:
             print(config.chrome_binary)
             chrome_options.binary_location = config.chrome_binary
-        chrome_options.add_argument('high-dpi-support=1')
-        chrome_options.add_argument('device-scale-factor=1')
-        chrome_options.add_argument('force-device-scale-factor=1')
-        chrome_options.add_argument('disable-gpu')
+        chrome_options.add_argument('--high-dpi-support=1')
+        chrome_options.add_argument('--device-scale-factor=1')
+        chrome_options.add_argument('--force-device-scale-factor=1')
+        chrome_options.add_argument('--disable-gpu')
 
         chrome_options.add_argument('--app=https://www.google.com')
         chrome_options.add_argument(f'--user-data-dir={config.profile_directory}')
@@ -67,42 +86,44 @@ def _initialize_driver(config, profile="chrome"):
 
         # TODO headless doesn't work at amazon
         if config.user_agent:
-            chrome_options.add_argument(f'user-agent={config.user_agent}')
+            chrome_options.add_argument(f'--user-agent={config.user_agent}')
         # https://stackoverflow.com/a/59111770
-        chrome_options.add_argument('disable-web-security')
-        chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
-        chrome_options.add_experimental_option('useAutomationExtension', False)
+        chrome_options.add_argument('--disable-web-security')
+        # chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
+        # chrome_options.add_experimental_option('useAutomationExtension', False)
 
-        service = Service(options=chrome_options, service_args=["--verbose", f"--log-path={log_name}"])
-        driver = webdriver.Chrome(service=service)
+        # service = Service(options=chrome_options, service_args=["--verbose", f"--log-path={log_name}"])
+        driver = uc.Chrome(options=chrome_options, service_args=["--verbose", f"--log-path={log_name}"],
+                           version_main=version_main)
+        driver.set_window_size(847, 1228)
     elif profile == 'chrome_existing':
         chrome_options = ChromeOptions()
         if config.chrome_binary:
             print(config.chrome_binary)
             chrome_options.binary_location = config.chrome_binary
-        chrome_options.add_argument('high-dpi-support=1')
-        chrome_options.add_argument('device-scale-factor=1')
-        chrome_options.add_argument('force-device-scale-factor=1')
-        chrome_options.add_argument('disable-gpu')
+        chrome_options.add_argument('--high-dpi-support=1')
+        chrome_options.add_argument('--device-scale-factor=1')
+        chrome_options.add_argument('--force-device-scale-factor=1')
+        chrome_options.add_argument('--disable-gpu')
         if config.headless:
             chrome_options.add_argument('--headless')
             chrome_options.add_argument('--window-size=960,1222')
         if config.user_agent:
-            chrome_options.add_argument(f'user-agent={config.user_agent}')
+            chrome_options.add_argument(f'--user-agent={config.user_agent}')
         # https://stackoverflow.com/a/59111770
-        chrome_options.add_argument('disable-web-security')
+        chrome_options.add_argument('--disable-web-security')
         chrome_options.add_experimental_option("debuggerAddress", "127.0.0.1:9014")
 
         service = Service(options=chrome_options, service_args=["--verbose", f"--log-path={log_name}"])
         driver = webdriver.Chrome(service=service)
     else:
-        service = Service(service_args=["--verbose", f"--log-path={log_name}"])
-        driver = webdriver.Chrome(service=service)
+        # service = Service(service_args=["--verbose", f"--log-path={log_name}"])
+        driver = uc.Chrome(service_args=["--verbose", f"--log-path={log_name}"], version_main=version_main)
     return driver
 
 
 def _reset_driver(driver, plugin):
-    driver.close()
+    driver.quit()
     print('recreate driver')
     return _initialize_driver(plugin.config, plugin.sub_config.driver)
 
